@@ -1,0 +1,28 @@
+{
+  "name": "lukasz-scigaj-portfolio-3d",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite --host",
+    "build": "vite build"
+  },
+  "devDependencies": {
+    "@types/react-dom": "^19.2.2",
+    "@vitejs/plugin-react": "5.1",
+    "vite": "^7.1.12",
+    "vite-plugin-restart": "^1.0.0"
+  },
+  "dependencies": {
+    "@react-three/drei": "^10.7.6",
+    "@react-three/fiber": "^9.4.0",
+    "gsap": "^3.13.0",
+    "howler": "^2.2.4",
+    "leva": "^0.10.0",
+    "r3f-perf": "^7.2.3",
+    "react": "19.2",
+    "react-dom": "19.2",
+    "three": "^0.180.0",
+    "zustand": "^5.0.8"
+  }
+}
