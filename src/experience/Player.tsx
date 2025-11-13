@@ -1,192 +1,169 @@
-// src/experience/Player.tsx
-import React, { useEffect, useRef } from "react";
+import { useMemo, useRef } from "react";
 import { useFrame, useThree } from "@react-three/fiber";
+import { useGLTF } from "@react-three/drei";
 import * as THREE from "three";
-import { Capsule } from "three/examples/jsm/math/Capsule.js";
-import usePhysicsStore from "../store/usePhysicsStore";
+import { RigidBody, RapierRigidBody } from "@react-three/rapier";
 import { useInputStore } from "../store/useInputStore";
 import { useAudioStore } from "../store/useAudioStore";
 
-const GRAVITY = 30;
-const CAPSULE_RADIUS = 0.35;
-const CAPSULE_HEIGHT = 1;
-const JUMP_HEIGHT = 11;
-const MOVE_SPEED = 7;
+const MOVE_SPEED = 15;
+const JUMP_SPEED = 14;
+
+type PortfolioGLTF = {
+  scene: THREE.Group;
+};
 
 export const Player: React.FC = () => {
-  const { camera, scene } = useThree();
-
-  const colliderOctree = usePhysicsStore((s) => s.colliderOctree);
-  const spawnPosition = usePhysicsStore((s) => s.spawnPosition);
-  const setSpawnPosition = usePhysicsStore((s) => s.setSpawnPosition);
+  const { camera } = useThree();
+  const { scene } = useGLTF(
+    "/models/Portfolio.glb"
+  ) as unknown as PortfolioGLTF;
 
   const pressed = useInputStore((s) => s.pressed);
-
   const isMuted = useAudioStore((s) => s.isMuted);
   const playSound = useAudioStore((s) => s.playSound);
-
-  const characterRef = useRef<THREE.Object3D | null>(null);
-  const colliderRef = useRef<Capsule | null>(null);
-  const velocityRef = useRef(new THREE.Vector3());
-  const onFloorRef = useRef(false);
-  const targetRotationRef = useRef(-Math.PI / 2);
-  const isMovingRef = useRef(false);
-  const cameraOffset = useRef(new THREE.Vector3(98, 50, 30));
-
-  // 1) Attach to the Character in the GLTF scene
-  useEffect(() => {
-    const character = scene.getObjectByName("Character");
-
-    if (!character) {
-      console.warn(
-        "Character object not found in GLTF (name must be 'Character')."
-      );
-      return;
+  const bodyRef = useRef<RapierRigidBody | null>(null);
+  const targetYawRef = useRef(-Math.PI / 2);
+  // clone Character mesh for the RigidBody
+  const characterMesh = useMemo(() => {
+    const original = scene.getObjectByName(
+      "Character"
+    ) as THREE.Object3D | null;
+    if (!original) {
+      console.warn("Character not found in GLTF (name must be 'Character').");
+      return null;
     }
+    const clone = original.clone(true);
+    clone.position.set(0, 0, 0);
+    clone.rotation.set(0, targetYawRef.current, 0);
+    return clone;
+  }, [scene]);
 
-    characterRef.current = character;
+  // original character world position (spawn)
+  const characterOrigin = useMemo(() => {
+    const original = scene.getObjectByName(
+      "Character"
+    ) as THREE.Object3D | null;
+    if (!original) return new THREE.Vector3(0, 3, 0);
+    return original.getWorldPosition(new THREE.Vector3());
+  }, [scene]);
 
-    // If we don't yet have a spawnPosition in the store, derive it from the GLTF
-    if (!spawnPosition) {
-      const pos = (character as THREE.Mesh).position.clone();
-      setSpawnPosition(pos);
+  const isOnFloorRef = useRef(false);
 
-      const start = pos.clone().add(new THREE.Vector3(0, CAPSULE_RADIUS, 0));
-      const end = pos.clone().add(new THREE.Vector3(0, CAPSULE_HEIGHT, 0));
+  useFrame(() => {
+    const body = bodyRef.current;
+    if (!body) return;
 
-      colliderRef.current = new Capsule(start, end, CAPSULE_RADIUS);
-    } else {
-      // spawnPosition already set from elsewhere (if you ever do that), use it
-      const start = spawnPosition
-        .clone()
-        .add(new THREE.Vector3(0, CAPSULE_RADIUS, 0));
-      const end = spawnPosition
-        .clone()
-        .add(new THREE.Vector3(0, CAPSULE_HEIGHT, 0));
+    const translation = body.translation();
+    const linvel = body.linvel();
 
-      colliderRef.current = new Capsule(start, end, CAPSULE_RADIUS);
-      character.position.copy(spawnPosition);
-    }
-  }, [scene, spawnPosition, setSpawnPosition]);
-
-  const respawn = () => {
-    const character = characterRef.current;
-    const collider = colliderRef.current;
-    const spawn = usePhysicsStore.getState().spawnPosition; // latest value
-
-    if (!character || !collider || !spawn) return;
-
-    collider.start.copy(spawn).add(new THREE.Vector3(0, CAPSULE_RADIUS, 0));
-    collider.end.copy(spawn).add(new THREE.Vector3(0, CAPSULE_HEIGHT, 0));
-
-    velocityRef.current.set(0, 0, 0);
-    isMovingRef.current = false;
-
-    character.position.copy(spawn);
-  };
-
-  const applyCollisions = () => {
-    const collider = colliderRef.current;
-    if (!collider || !colliderOctree) return;
-
-    const result = colliderOctree.capsuleIntersect(collider);
-    onFloorRef.current = false;
-
-    if (result) {
-      onFloorRef.current = result.normal.y > 0;
-      collider.translate(result.normal.multiplyScalar(result.depth));
-
-      if (onFloorRef.current) {
-        isMovingRef.current = false;
-        velocityRef.current.x = 0;
-        velocityRef.current.z = 0;
-      }
-    }
-  };
-
-  const handleMovementInput = () => {
-    const collider = colliderRef.current;
-    if (!collider) return;
-    if (isMovingRef.current) return;
-    if (!Object.values(pressed).some(Boolean)) return;
-
-    const vel = velocityRef.current;
-
-    if (!isMuted) {
-      playSound("jumpSFX");
-    }
-
+    // Direction from input
+    const dir = new THREE.Vector3(0, 0, 0);
     if (pressed.up) {
-      vel.z -= MOVE_SPEED;
-      targetRotationRef.current = Math.PI;
+      dir.x -= 1;
+      targetYawRef.current = -Math.PI / 2;
     }
     if (pressed.down) {
-      vel.z += MOVE_SPEED;
-      targetRotationRef.current = 0;
+      dir.x += 1;
+      targetYawRef.current = Math.PI / 2;
     }
     if (pressed.left) {
-      vel.x -= MOVE_SPEED;
-      targetRotationRef.current = -Math.PI / 2;
+      dir.z += 1;
+      targetYawRef.current = 0;
     }
     if (pressed.right) {
-      vel.x += MOVE_SPEED;
-      targetRotationRef.current = Math.PI / 2;
+      dir.z -= 1;
+      targetYawRef.current = Math.PI;
     }
 
-    vel.y = JUMP_HEIGHT;
-    isMovingRef.current = true;
-  };
+    const hasInput = dir.lengthSq() > 0;
 
-  useFrame((_, delta) => {
-    const character = characterRef.current;
-    const collider = colliderRef.current;
-    if (!character || !collider) return;
+    if (hasInput) {
+      dir.normalize();
 
-    const vel = velocityRef.current;
-    const dt = Math.min(delta, 0.035);
+      // Base horizontal velocity
+      const baseX = dir.x * MOVE_SPEED;
+      const baseZ = dir.z * MOVE_SPEED;
+      let vy = linvel.y; // start from current vertical velocity
 
-    if (character.position.y < -20) {
-      respawn();
-      return;
+      // Jump ONCE when starting to move on the floor
+      if (isOnFloorRef.current) {
+        if (!isMuted) playSound("jumpSFX");
+        vy = JUMP_SPEED;
+      }
+
+      body.setLinvel({ x: baseX, y: vy, z: baseZ }, true);
+      const MODEL_YAW_OFFSET = Math.PI / 2; // because mesh is pre-rotated -PI/2
+
+      // Read current yaw from the body's quaternion
+      const q = body.rotation();
+      const curQ = new THREE.Quaternion(q.x, q.y, q.z, q.w);
+
+      const targetQ = new THREE.Quaternion().setFromEuler(
+        new THREE.Euler(0, targetYawRef.current + MODEL_YAW_OFFSET, 0)
+      );
+
+      // slerp along the shortest arc
+      curQ.slerp(targetQ, 0.2);
+
+      body.setRotation({ x: curQ.x, y: curQ.y, z: curQ.z, w: curQ.w }, true);
+    } else {
+      // No input: small damping so we don't slide forever
+      body.setLinvel(
+        { x: linvel.x * 0.9, y: linvel.y, z: linvel.z * 0.9 },
+        true
+      );
     }
 
-    if (!onFloorRef.current) {
-      vel.y -= GRAVITY * dt;
-    }
+    // Kill unwanted spinning
+    body.setAngvel({ x: 0, y: 0, z: 0 }, true);
 
-    handleMovementInput();
-
-    collider.translate(vel.clone().multiplyScalar(dt));
-    applyCollisions();
-
-    character.position.copy(collider.start);
-    character.position.y -= CAPSULE_RADIUS;
-
-    const currentRot = character.rotation.y;
-    const targetRot = targetRotationRef.current;
-    const rotationDiff =
-      ((((targetRot - currentRot) % (2 * Math.PI)) + 3 * Math.PI) %
-        (2 * Math.PI)) -
-      Math.PI;
-
-    const finalRot = currentRot + rotationDiff;
-    character.rotation.y = THREE.MathUtils.lerp(currentRot, finalRot, 0.4);
-
-    const offset = cameraOffset.current;
-    const targetCameraPosition = new THREE.Vector3(
-      character.position.x + offset.x - 20,
-      offset.y,
-      character.position.z + offset.z + 30
+    // Camera follow
+    const camTarget = new THREE.Vector3(
+      translation.x + 98 - 20,
+      50,
+      translation.z + 30
     );
-
-    camera.position.lerp(targetCameraPosition, 0.1);
+    camera.position.lerp(camTarget, 0.1);
     camera.lookAt(
-      character.position.x + 10,
+      translation.x + 10,
       camera.position.y - 39,
-      character.position.z + 10
+      translation.z + 10
     );
+
+    // Respawn if falling
+    if (translation.y < -20) {
+      body.setTranslation(
+        {
+          x: characterOrigin.x,
+          y: characterOrigin.y + 2,
+          z: characterOrigin.z,
+        },
+        true
+      );
+      body.setLinvel({ x: 0, y: 0, z: 0 }, true);
+    }
   });
 
-  // Character is already part of the GLTF tree from <World />, so we render nothing here.
-  return null;
+  if (!characterMesh) return null;
+
+  return (
+    <RigidBody
+      ref={bodyRef}
+      colliders="ball"
+      mass={1}
+      position={[characterOrigin.x, characterOrigin.y + 2, characterOrigin.z]}
+      enabledRotations={[false, false, false]}
+      linearDamping={1.5}
+      friction={1}
+      onCollisionEnter={() => {
+        isOnFloorRef.current = true;
+      }}
+      onCollisionExit={() => {
+        isOnFloorRef.current = false;
+      }}
+    >
+      <primitive object={characterMesh} castShadow receiveShadow />
+    </RigidBody>
+  );
 };

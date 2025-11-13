@@ -1,11 +1,12 @@
-import React, { Suspense } from "react";
+import { Suspense } from "react";
 import { Canvas } from "@react-three/fiber";
-import { OrbitControls } from "@react-three/drei";
 import * as THREE from "three";
 import { World } from "./World";
 import { Player } from "./Player";
 import { Interactables } from "./Interactables";
 import { LoadingScreen } from "../ui/LoadingScreen";
+import { Physics } from "@react-three/rapier";
+
 const Experience: React.FC = () => {
   return (
     <Canvas
@@ -43,9 +44,11 @@ const Experience: React.FC = () => {
       <ambientLight intensity={2.7} />
 
       <Suspense fallback={<LoadingScreen />}>
-        <World />
-        <Player />
-        <Interactables />
+        <Physics gravity={[0, -40, 0]}>
+          <World />
+          <Player />
+          <Interactables />
+        </Physics>
       </Suspense>
     </Canvas>
   );

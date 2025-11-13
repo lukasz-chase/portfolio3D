@@ -1,9 +1,7 @@
-// src/experience/World.tsx
-import React, { useEffect } from "react";
+import { useMemo } from "react";
 import { useGLTF } from "@react-three/drei";
 import * as THREE from "three";
-import { Octree } from "three/examples/jsm/math/Octree.js";
-import usePhysicsStore from "../store/usePhysicsStore";
+import { RigidBody } from "@react-three/rapier";
 
 type PortfolioGLTF = {
   scene: THREE.Group;
@@ -15,26 +13,49 @@ export const World: React.FC = () => {
   const { scene } = useGLTF(
     "/models/Portfolio.glb"
   ) as unknown as PortfolioGLTF;
-  const setColliderOctree = usePhysicsStore((s) => s.setColliderOctree);
 
-  useEffect(() => {
-    const octree = new Octree();
+  // Clone & strip things so we don't reuse the same Object3D in multiple places
+  const { environment, collidersMesh } = useMemo(() => {
+    const env = scene.clone(true);
 
-    scene.traverse((child) => {
+    const characterInEnv = env.getObjectByName("Character");
+    if (characterInEnv) {
+      characterInEnv.parent?.remove(characterInEnv);
+    }
+
+    const collidersInEnv = env.getObjectByName("Colliders");
+    if (collidersInEnv) {
+      collidersInEnv.parent?.remove(collidersInEnv);
+    }
+
+    const collidersOriginal = scene.getObjectByName(
+      "Colliders"
+    ) as THREE.Mesh | null;
+    console.log(collidersOriginal);
+    const collidersClone = collidersOriginal
+      ? collidersOriginal.clone(true)
+      : null;
+
+    env.traverse((child) => {
       if ((child as THREE.Mesh).isMesh) {
         const mesh = child as THREE.Mesh;
         mesh.castShadow = true;
         mesh.receiveShadow = true;
       }
-
-      if (child.name === "Colliders") {
-        octree.fromGraphNode(child);
-        (child as THREE.Mesh).visible = false;
-      }
     });
 
-    setColliderOctree(octree);
-  }, [scene, setColliderOctree]);
+    return { environment: env, collidersMesh: collidersClone };
+  }, [scene]);
 
-  return <primitive object={scene} />;
+  return (
+    <>
+      <primitive object={environment} />
+
+      {collidersMesh && (
+        <RigidBody type="fixed" colliders="trimesh" includeInvisible>
+          <primitive object={collidersMesh} visible={false} />
+        </RigidBody>
+      )}
+    </>
+  );
 };
