@@ -1,10 +1,10 @@
 import { useMemo, useRef } from "react";
 import { useFrame, useThree } from "@react-three/fiber";
-import { useGLTF } from "@react-three/drei";
+import { useGLTF, useKeyboardControls } from "@react-three/drei";
 import * as THREE from "three";
 import { RigidBody, RapierRigidBody } from "@react-three/rapier";
-import { useInputStore } from "../store/useInputStore";
 import { useAudioStore } from "../store/useAudioStore";
+import { useInputStore } from "../store/useInputStore";
 
 const MOVE_SPEED = 15;
 const JUMP_SPEED = 14;
@@ -19,11 +19,15 @@ export const Player: React.FC = () => {
     "/models/Portfolio.glb"
   ) as unknown as PortfolioGLTF;
 
-  const pressed = useInputStore((s) => s.pressed);
-  const isMuted = useAudioStore((s) => s.isMuted);
-  const playSound = useAudioStore((s) => s.playSound);
+  const { isMuted, playSound } = useAudioStore();
+
   const bodyRef = useRef<RapierRigidBody | null>(null);
   const targetYawRef = useRef(-Math.PI / 2);
+  const isOnFloorRef = useRef(false);
+
+  const [, getKeys] = useKeyboardControls();
+  const virtual = useInputStore((s) => s.pressed);
+
   // clone Character mesh for the RigidBody
   const characterMesh = useMemo(() => {
     const original = scene.getObjectByName(
@@ -48,8 +52,6 @@ export const Player: React.FC = () => {
     return original.getWorldPosition(new THREE.Vector3());
   }, [scene]);
 
-  const isOnFloorRef = useRef(false);
-
   useFrame(() => {
     const body = bodyRef.current;
     if (!body) return;
@@ -57,21 +59,27 @@ export const Player: React.FC = () => {
     const translation = body.translation();
     const linvel = body.linvel();
 
-    // Direction from input
+    const { forward, backward, leftward, rightward } = getKeys();
+
+    const up = forward || virtual.up;
+    const down = backward || virtual.down;
+    const left = leftward || virtual.left;
+    const right = rightward || virtual.right;
+
     const dir = new THREE.Vector3(0, 0, 0);
-    if (pressed.up) {
+    if (up) {
       dir.x -= 1;
       targetYawRef.current = -Math.PI / 2;
     }
-    if (pressed.down) {
+    if (down) {
       dir.x += 1;
       targetYawRef.current = Math.PI / 2;
     }
-    if (pressed.left) {
+    if (left) {
       dir.z += 1;
       targetYawRef.current = 0;
     }
-    if (pressed.right) {
+    if (right) {
       dir.z -= 1;
       targetYawRef.current = Math.PI;
     }
@@ -84,28 +92,26 @@ export const Player: React.FC = () => {
       // Base horizontal velocity
       const baseX = dir.x * MOVE_SPEED;
       const baseZ = dir.z * MOVE_SPEED;
-      let vy = linvel.y; // start from current vertical velocity
+      let vy = linvel.y; // keep current vertical velocity
 
-      // Jump ONCE when starting to move on the floor
+      // Jump while moving & grounded (your current behaviour)
       if (isOnFloorRef.current) {
         if (!isMuted) playSound("jumpSFX");
         vy = JUMP_SPEED;
       }
 
       body.setLinvel({ x: baseX, y: vy, z: baseZ }, true);
-      const MODEL_YAW_OFFSET = Math.PI / 2; // because mesh is pre-rotated -PI/2
 
-      // Read current yaw from the body's quaternion
+      // Rotate towards target yaw
+      const MODEL_YAW_OFFSET = Math.PI / 2; // mesh pre-rotated -PI/2 in GLB
       const q = body.rotation();
       const curQ = new THREE.Quaternion(q.x, q.y, q.z, q.w);
-
       const targetQ = new THREE.Quaternion().setFromEuler(
         new THREE.Euler(0, targetYawRef.current + MODEL_YAW_OFFSET, 0)
       );
 
-      // slerp along the shortest arc
+      // slerp along shortest arc
       curQ.slerp(targetQ, 0.2);
-
       body.setRotation({ x: curQ.x, y: curQ.y, z: curQ.z, w: curQ.w }, true);
     } else {
       // No input: small damping so we don't slide forever
