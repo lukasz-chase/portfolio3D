@@ -1,11 +1,13 @@
 import { useGLTF } from "@react-three/drei";
 
-const path = "/models/Scene.glb";
+const path = "/models/KoffeecupBuilding.glb";
 
 useGLTF.preload(path);
 
-export const World: React.FC = () => {
+const KoffeecupBuilding: React.FC = () => {
   const { scene } = useGLTF(path);
 
   return <primitive object={scene.children[0]} castShadow receiveShadow />;
 };
+
+export default KoffeecupBuilding;

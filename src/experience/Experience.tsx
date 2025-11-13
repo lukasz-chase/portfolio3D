@@ -2,12 +2,14 @@ import { Suspense } from "react";
 import { Canvas } from "@react-three/fiber";
 import * as THREE from "three";
 import { World } from "./World";
-import { Player } from "./Player";
+import { Player } from "../components/Player";
 import { Interactables } from "./Interactables";
 import { LoadingScreen } from "../ui/LoadingScreen";
 import { Physics } from "@react-three/rapier";
-import { KeyboardControls } from "@react-three/drei";
+import { KeyboardControls, OrbitControls } from "@react-three/drei";
 import ControlsOverlay from "../ui/ControlsOverlay";
+import Dog from "../components/Dog";
+import Colliders from "../components/Colliders";
 
 const Experience: React.FC = () => {
   return (
@@ -41,7 +43,7 @@ const Experience: React.FC = () => {
         }}
       >
         <color attach="background" args={["#aec972"]} />
-
+        <OrbitControls />
         <directionalLight
           castShadow
           position={[280, 200, -80]}
@@ -56,9 +58,11 @@ const Experience: React.FC = () => {
         <ambientLight intensity={2.7} />
 
         <Suspense fallback={<LoadingScreen />}>
-          <Physics gravity={[0, -40, 0]}>
+          <Physics gravity={[0, -40, 0]} debug>
             <World />
             <Player />
+            <Dog />
+            <Colliders />
             <Interactables />
           </Physics>
         </Suspense>

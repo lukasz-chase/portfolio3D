@@ -9,47 +9,30 @@ import { useInputStore } from "../store/useInputStore";
 const MOVE_SPEED = 15;
 const JUMP_SPEED = 14;
 
-type PortfolioGLTF = {
-  scene: THREE.Group;
-};
-
 export const Player: React.FC = () => {
   const { camera } = useThree();
-  const { scene } = useGLTF(
-    "/models/Portfolio.glb"
-  ) as unknown as PortfolioGLTF;
+  const { scene } = useGLTF("/models/Character.glb");
 
   const { isMuted, playSound } = useAudioStore();
 
   const bodyRef = useRef<RapierRigidBody | null>(null);
   const targetYawRef = useRef(-Math.PI / 2);
   const isOnFloorRef = useRef(false);
+  const initPosition = {
+    x: 121,
+    y: 2,
+    z: -4,
+  };
 
   const [, getKeys] = useKeyboardControls();
   const virtual = useInputStore((s) => s.pressed);
 
   // clone Character mesh for the RigidBody
   const characterMesh = useMemo(() => {
-    const original = scene.getObjectByName(
-      "Character"
-    ) as THREE.Object3D | null;
-    if (!original) {
-      console.warn("Character not found in GLTF (name must be 'Character').");
-      return null;
-    }
-    const clone = original.clone(true);
+    const clone = scene.children[0].clone(true);
     clone.position.set(0, 0, 0);
     clone.rotation.set(0, targetYawRef.current, 0);
     return clone;
-  }, [scene]);
-
-  // original character world position (spawn)
-  const characterOrigin = useMemo(() => {
-    const original = scene.getObjectByName(
-      "Character"
-    ) as THREE.Object3D | null;
-    if (!original) return new THREE.Vector3(0, 3, 0);
-    return original.getWorldPosition(new THREE.Vector3());
   }, [scene]);
 
   useFrame(() => {
@@ -95,7 +78,9 @@ export const Player: React.FC = () => {
       let vy = linvel.y; // keep current vertical velocity
 
       // Jump while moving & grounded (your current behaviour)
+      console.log(isOnFloorRef.current);
       if (isOnFloorRef.current) {
+        console.log("jump");
         if (!isMuted) playSound("jumpSFX");
         vy = JUMP_SPEED;
       }
@@ -139,17 +124,17 @@ export const Player: React.FC = () => {
 
     // Respawn if falling
     if (translation.y < -20) {
-      body.setTranslation(
-        {
-          x: characterOrigin.x,
-          y: characterOrigin.y + 2,
-          z: characterOrigin.z,
-        },
-        true
-      );
+      body.setTranslation(initPosition, true);
       body.setLinvel({ x: 0, y: 0, z: 0 }, true);
     }
   });
+
+  const handleCollisionEnter = () => {
+    const translation = bodyRef.current?.translation();
+    if (translation!.y < 1.5) {
+      isOnFloorRef.current = true;
+    }
+  };
 
   if (!characterMesh) return null;
 
@@ -158,13 +143,11 @@ export const Player: React.FC = () => {
       ref={bodyRef}
       colliders="ball"
       mass={1}
-      position={[characterOrigin.x, characterOrigin.y + 2, characterOrigin.z]}
+      position={[initPosition.x, initPosition.y, initPosition.z]}
       enabledRotations={[false, false, false]}
       linearDamping={1.5}
       friction={1}
-      onCollisionEnter={() => {
-        isOnFloorRef.current = true;
-      }}
+      onCollisionEnter={handleCollisionEnter}
       onCollisionExit={() => {
         isOnFloorRef.current = false;
       }}

@@ -1,11 +1,13 @@
 import { useGLTF } from "@react-three/drei";
 
-const path = "/models/Scene.glb";
+const path = "/models/Bench.glb";
 
 useGLTF.preload(path);
 
-export const World: React.FC = () => {
+const Bench: React.FC = () => {
   const { scene } = useGLTF(path);
 
   return <primitive object={scene.children[0]} castShadow receiveShadow />;
 };
+
+export default Bench;
