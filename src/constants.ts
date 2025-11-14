@@ -1,33 +1,47 @@
 import { ModalContent, ModalId } from "./types";
 
+export const MODAL_IDS = {
+  PROJECT_TRUEGRIND: "Project_Truegrind",
+  PROJECT_LUKASZVILE: "Project_Lukaszvile",
+  PROJECT_HANGMAN: "Project_Hangman",
+  LUKASZVILE: "Lukaszvile",
+  GOOD_BUILDING: "Good_Building",
+  KOFFEECUP_BUILDING: "Koffeecup_Building",
+  MUP_BUILDING: "Mup_Building",
+} as const;
+
 export const MODAL_CONTENT: Record<ModalId, ModalContent> = {
-  Project_1: {
-    title: "🍜Recipe Finder👩🏻‍🍳",
-    content:
-      "Let's get cooking! This project uses TheMealDB API for some recipes and populates my React card components. This shows my skills in working with consistent design systems using components. There is also pagination to switch pages.",
+  [MODAL_IDS.PROJECT_TRUEGRIND]: {
+    title: "True Grind",
+    content: "True Grind is a workout tracking app",
     link: "https://example.com/",
   },
-  Project_2: {
-    title: "📋ToDo List✏️",
-    content:
-      "Keeping up with everything is really exhausting so I wanted to create my own ToDo list app. But I wanted my ToDo list to look like an actual ToDo list so I used Tailwind CSS for consistency and also did state management with React hooks like useState.",
+  [MODAL_IDS.PROJECT_LUKASZVILE]: {
+    title: "Lukaszvile",
+    content: "This is the website you are using, a 3d portfolio",
     link: "https://example.com/",
   },
-  Project_3: {
-    title: "🌞Weather App😎",
-    content:
-      "Rise and shine as they say (but sometimes it's not all that shiny outside). Using a location-based API the user can automatically detect their location and my application will show them the weather near them. I also put some of my design skills to use using Figma.",
+  [MODAL_IDS.PROJECT_HANGMAN]: {
+    title: "Hangman",
+    content: "Project I created as my praca inzynierska",
     link: "https://example.com/",
   },
-  Chest: {
-    title: "💁‍♀️ About Me",
+  [MODAL_IDS.LUKASZVILE]: {
+    title: "About Me",
     content:
-      "Hi you found my chest👋, I'm Bella Xu and I am an aspiring creative developer and designer. I just started web development this year! In the signs, you will see some of my most recent projects that I'm proud of. I hope to add a lot more in the future. In my free time, I like to draw, watch TV shows (especially Pokémon), do clay sculpting and needle felting. Reach out if you wanna chat. Bella is OUT!!! 🏃‍♀️",
+      "Hi, I'm Łukasz Ścigaj and I am an Full Stack Developer based in Poland.",
   },
-  Picnic: {
-    title: "🍷 Uggh yesss 🧺",
-    content:
-      " Picnics are my thanggg don't @ me. Lying down with some good grape juice inna wine glass and a nice book at a park is my total vibe. If this isn't max aura points 💯 idk what is.",
+  [MODAL_IDS.GOOD_BUILDING]: {
+    title: "Experience",
+    content: "GOOD: czas: tytul",
+  },
+  [MODAL_IDS.KOFFEECUP_BUILDING]: {
+    title: "Experience",
+    content: "Koffeecup: czas: tytul",
+  },
+  [MODAL_IDS.MUP_BUILDING]: {
+    title: "Education",
+    content: "Mup: czas: tytul",
   },
 };
 export const MOVE_SPEED = 35;

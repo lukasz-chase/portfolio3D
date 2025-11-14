@@ -1,24 +1,20 @@
-import { useGLTF } from "@react-three/drei";
-import { useEffect } from "react";
-import { Mesh } from "three";
+import InteractiveModel from "./InteractiveModel";
 
 const path = "/models/GithubText.glb";
 
-useGLTF.preload(path);
-
 const GithubText: React.FC = () => {
-  const { scene } = useGLTF(path);
-
-  useEffect(() => {
-    scene.traverse((child) => {
-      if ((child as Mesh).isMesh) {
-        child.castShadow = true;
-        child.receiveShadow = true;
+  return (
+    <InteractiveModel
+      path={path}
+      onClick={() =>
+        window.open(
+          "https://github.com/lukasz-chase",
+          "_blank",
+          "noopener,noreferrer"
+        )
       }
-    });
-  }, [scene]);
-
-  return <primitive object={scene} />;
+    />
+  );
 };
 
 export default GithubText;

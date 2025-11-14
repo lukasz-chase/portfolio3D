@@ -1,9 +1,6 @@
-export type ModalId =
-  | "Project_1"
-  | "Project_2"
-  | "Project_3"
-  | "Chest"
-  | "Picnic";
+import { MODAL_IDS } from "./constants";
+
+export type ModalId = (typeof MODAL_IDS)[keyof typeof MODAL_IDS];
 
 export type ModalContent = {
   title: string;

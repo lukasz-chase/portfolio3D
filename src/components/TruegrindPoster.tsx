@@ -1,20 +1,18 @@
-import { useGLTF } from "@react-three/drei";
-import { useEffect } from "react";
-import { Mesh } from "three";
+import { useModalStore } from "../store/useModalStore";
+import { MODAL_IDS } from "../constants";
+import InteractiveModel from "./InteractiveModel";
+
+const path = "/models/TruegrindPoster.glb";
 
 const TruegrindPoster: React.FC = () => {
-  const { scene } = useGLTF("/models/TruegrindPoster.glb");
+  const openModal = useModalStore((store) => store.openModal);
 
-  useEffect(() => {
-    scene.traverse((child) => {
-      if ((child as Mesh).isMesh) {
-        child.castShadow = true;
-        child.receiveShadow = true;
-      }
-    });
-  }, [scene]);
-
-  return <primitive object={scene} />;
+  return (
+    <InteractiveModel
+      path={path}
+      onClick={() => openModal(MODAL_IDS.PROJECT_TRUEGRIND)}
+    />
+  );
 };
 
 export default TruegrindPoster;

@@ -1,20 +1,14 @@
-import { useGLTF } from "@react-three/drei";
-import { useEffect } from "react";
-import { Mesh } from "three";
+import InteractiveModel from "./InteractiveModel";
 
 const EmailText: React.FC = () => {
-  const { scene } = useGLTF("/models/EmailText.glb");
-
-  useEffect(() => {
-    scene.traverse((child) => {
-      if ((child as Mesh).isMesh) {
-        child.castShadow = true;
-        child.receiveShadow = true;
+  return (
+    <InteractiveModel
+      path="/models/EmailText.glb"
+      onClick={() =>
+        (window.location.href = "mailto:lukasz.scigaj00@gmail.com")
       }
-    });
-  }, [scene]);
-
-  return <primitive object={scene} />;
+    />
+  );
 };
 
 export default EmailText;
