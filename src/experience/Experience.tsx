@@ -1,4 +1,4 @@
-import { Suspense } from "react";
+import { Suspense, useRef } from "react";
 import { Canvas } from "@react-three/fiber";
 import * as THREE from "three";
 import { World } from "./World";
@@ -6,10 +6,11 @@ import { Player } from "../components/Player";
 import { Interactables } from "./Interactables";
 import { LoadingScreen } from "../ui/LoadingScreen";
 import { Physics } from "@react-three/rapier";
-import { KeyboardControls, OrbitControls } from "@react-three/drei";
+import { KeyboardControls, OrbitControls, useHelper } from "@react-three/drei";
 import ControlsOverlay from "../ui/ControlsOverlay";
 import Dog from "../components/Dog";
 import Colliders from "../components/Colliders";
+import { Perf } from "r3f-perf";
 
 const Experience: React.FC = () => {
   return (
@@ -42,23 +43,23 @@ const Experience: React.FC = () => {
           gl.toneMappingExposure = 1.7;
         }}
       >
+        <Perf position="top-left" />
         <color attach="background" args={["#aec972"]} />
         <OrbitControls />
         <directionalLight
           castShadow
-          position={[280, 200, -80]}
-          intensity={1}
+          position={[200, 200, -40]}
+          intensity={2}
           shadow-mapSize-width={4096}
           shadow-mapSize-height={4096}
-          shadow-camera-left={-150}
+          shadow-camera-left={-250}
           shadow-camera-right={300}
-          shadow-camera-top={150}
-          shadow-camera-bottom={-100}
+          shadow-camera-top={200}
+          shadow-camera-bottom={-200}
         />
         <ambientLight intensity={2.7} />
-
         <Suspense fallback={<LoadingScreen />}>
-          <Physics gravity={[0, -40, 0]} debug>
+          <Physics gravity={[0, -40, 0]}>
             <World />
             <Player />
             <Dog />

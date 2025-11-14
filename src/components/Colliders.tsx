@@ -8,7 +8,7 @@ const Colliders: React.FC = () => {
 
   return (
     <RigidBody type="fixed" colliders="trimesh" includeInvisible>
-      <primitive object={scene.children[0]} visible={false} />
+      <primitive object={scene} visible={false} />
     </RigidBody>
   );
 };

@@ -1,9 +1,20 @@
 import { useGLTF } from "@react-three/drei";
+import { useEffect } from "react";
+import { Mesh } from "three";
 
 const Car: React.FC = () => {
   const { scene } = useGLTF("/models/Car.glb");
 
-  return <primitive object={scene.children[0]} castShadow receiveShadow />;
+  useEffect(() => {
+    scene.traverse((child) => {
+      if ((child as Mesh).isMesh) {
+        child.castShadow = true;
+        child.receiveShadow = true;
+      }
+    });
+  }, [scene]);
+
+  return <primitive object={scene} />;
 };
 
 export default Car;

@@ -5,15 +5,19 @@ import * as THREE from "three";
 import { RigidBody, RapierRigidBody } from "@react-three/rapier";
 import { useAudioStore } from "../store/useAudioStore";
 import { useInputStore } from "../store/useInputStore";
-
-const MOVE_SPEED = 15;
-const JUMP_SPEED = 14;
+import { useControls } from "leva";
+import { JUMP_SPEED, MOVE_SPEED } from "../constants";
 
 export const Player: React.FC = () => {
   const { camera } = useThree();
   const { scene } = useGLTF("/models/Character.glb");
 
   const { isMuted, playSound } = useAudioStore();
+
+  const { moveSpeed, jumpSpeed } = useControls("Player", {
+    moveSpeed: { value: MOVE_SPEED, min: 0, max: 100, step: 1 },
+    jumpSpeed: { value: JUMP_SPEED, min: 0, max: 100, step: 1 },
+  });
 
   const bodyRef = useRef<RapierRigidBody | null>(null);
   const targetYawRef = useRef(-Math.PI / 2);
@@ -32,6 +36,15 @@ export const Player: React.FC = () => {
     const clone = scene.children[0].clone(true);
     clone.position.set(0, 0, 0);
     clone.rotation.set(0, targetYawRef.current, 0);
+
+    clone.traverse((child) => {
+      if ((child as THREE.Mesh).isMesh) {
+        const mesh = child as THREE.Mesh;
+        mesh.castShadow = true;
+        mesh.receiveShadow = true;
+      }
+    });
+
     return clone;
   }, [scene]);
 
@@ -73,16 +86,14 @@ export const Player: React.FC = () => {
       dir.normalize();
 
       // Base horizontal velocity
-      const baseX = dir.x * MOVE_SPEED;
-      const baseZ = dir.z * MOVE_SPEED;
-      let vy = linvel.y; // keep current vertical velocity
+      const baseX = dir.x * moveSpeed;
+      const baseZ = dir.z * moveSpeed;
+      let vy = linvel.y; // keep current vertical velocitysd
 
       // Jump while moving & grounded (your current behaviour)
-      console.log(isOnFloorRef.current);
       if (isOnFloorRef.current) {
-        console.log("jump");
         if (!isMuted) playSound("jumpSFX");
-        vy = JUMP_SPEED;
+        vy = jumpSpeed;
       }
 
       body.setLinvel({ x: baseX, y: vy, z: baseZ }, true);

@@ -6,6 +6,7 @@ import {
   RapierRigidBody,
   CuboidCollider,
 } from "@react-three/rapier";
+import { Mesh } from "three";
 
 const Dog: React.FC = () => {
   const { scene } = useGLTF("/models/Dog.glb");
@@ -14,12 +15,19 @@ const Dog: React.FC = () => {
   const bodyRef = useRef<RapierRigidBody | null>(null);
   const isOnFloorRef = useRef(false);
 
-  // clone Character mesh for the RigidBody
   const characterMesh = useMemo(() => {
-    console.log(scene);
     const clone = scene.children[0].clone(true);
     clone.position.set(0, 0, 0);
     clone.rotation.set(Math.PI, 0, 0);
+
+    clone.traverse((child) => {
+      if ((child as Mesh).isMesh) {
+        const mesh = child as Mesh;
+        mesh.castShadow = true;
+        mesh.receiveShadow = true;
+      }
+    });
+
     return clone;
   }, [scene]);
 

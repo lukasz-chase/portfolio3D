@@ -1,4 +1,6 @@
+import { useEffect } from "react";
 import { useGLTF } from "@react-three/drei";
+import { Mesh } from "three";
 
 const path = "/models/Bench.glb";
 
@@ -7,7 +9,16 @@ useGLTF.preload(path);
 const Bench: React.FC = () => {
   const { scene } = useGLTF(path);
 
-  return <primitive object={scene.children[0]} castShadow receiveShadow />;
+  useEffect(() => {
+    scene.traverse((child) => {
+      if ((child as Mesh).isMesh) {
+        child.castShadow = true;
+        child.receiveShadow = true;
+      }
+    });
+  }, [scene]);
+
+  return <primitive object={scene} />;
 };
 
 export default Bench;

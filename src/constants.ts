@@ -30,3 +30,5 @@ export const MODAL_CONTENT: Record<ModalId, ModalContent> = {
       " Picnics are my thanggg don't @ me. Lying down with some good grape juice inna wine glass and a nice book at a park is my total vibe. If this isn't max aura points 💯 idk what is.",
   },
 };
+export const MOVE_SPEED = 35;
+export const JUMP_SPEED = 14;
