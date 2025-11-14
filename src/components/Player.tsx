@@ -5,6 +5,8 @@ import * as THREE from "three";
 import { RigidBody, RapierRigidBody } from "@react-three/rapier";
 import { useAudioStore } from "../store/useAudioStore";
 import { useInputStore } from "../store/useInputStore";
+import { useShallow } from "zustand/shallow";
+import { usePlayerStore } from "../store/usePlayerStore";
 import { useControls } from "leva";
 import { JUMP_SPEED, MOVE_SPEED } from "../constants";
 
@@ -12,6 +14,13 @@ export const Player: React.FC = () => {
   const { camera } = useThree();
   const { scene } = useGLTF("/models/Character.glb");
 
+  const { setPlayerPosition, playerHasMoved, setHasMoved } = usePlayerStore(
+    useShallow((s) => ({
+      setPlayerPosition: s.setPosition,
+      playerHasMoved: s.hasMoved,
+      setHasMoved: s.setHasMoved,
+    }))
+  );
   const { isMuted, playSound } = useAudioStore();
 
   const { moveSpeed, jumpSpeed } = useControls("Player", {
@@ -53,6 +62,8 @@ export const Player: React.FC = () => {
     if (!body) return;
 
     const translation = body.translation();
+    setPlayerPosition(translation.x, translation.y, translation.z);
+
     const linvel = body.linvel();
 
     const { forward, backward, leftward, rightward } = getKeys();
@@ -83,6 +94,10 @@ export const Player: React.FC = () => {
     const hasInput = dir.lengthSq() > 0;
 
     if (hasInput) {
+      if (!playerHasMoved) {
+        setHasMoved();
+      }
+
       dir.normalize();
 
       // Base horizontal velocity
