@@ -1,4 +1,3 @@
-// src/store/useInputStore.ts
 import { create } from "zustand";
 
 export type Direction = "up" | "down" | "left" | "right";

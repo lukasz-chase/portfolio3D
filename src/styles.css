@@ -272,9 +272,20 @@ body,
   transition-delay: 0.1s;
 }
 
-.second-icon,
-.second-icon-two {
+.first-icon {
+  display: block;
+}
+
+.second-icon {
   display: none;
+}
+
+.dark-theme .first-icon {
+  display: none;
+}
+
+.dark-theme .second-icon {
+  display: block;
 }
 
 /* Media Queries */

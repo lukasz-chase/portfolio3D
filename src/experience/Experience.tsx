@@ -1,4 +1,4 @@
-import { Suspense, useRef } from "react";
+import { Suspense, useEffect, useRef, useState } from "react";
 import { Canvas } from "@react-three/fiber";
 import * as THREE from "three";
 import { World } from "./World";
@@ -11,8 +11,26 @@ import ControlsOverlay from "../ui/ControlsOverlay";
 import Dog from "../components/Dog";
 import Colliders from "../components/Colliders";
 import { Perf } from "r3f-perf";
+import { Lights } from "./Lights";
 
 const Experience: React.FC = () => {
+  const [zoom, setZoom] = useState(20);
+
+  useEffect(() => {
+    const updateZoom = () => {
+      const width = window.innerWidth;
+
+      if (width < 400) setZoom(9);
+      else if (width < 768) setZoom(13);
+      else if (width < 1024) setZoom(15);
+      else setZoom(20);
+    };
+
+    updateZoom(); // run on load
+    window.addEventListener("resize", updateZoom);
+
+    return () => window.removeEventListener("resize", updateZoom);
+  }, []);
   return (
     <KeyboardControls
       map={[
@@ -29,7 +47,7 @@ const Experience: React.FC = () => {
         shadows
         camera={{
           position: [98, 50, 30],
-          zoom: 20,
+          zoom: zoom,
           near: 1,
           far: 1000,
         }}
@@ -46,18 +64,7 @@ const Experience: React.FC = () => {
         <Perf position="top-left" />
         <color attach="background" args={["#aec972"]} />
         <OrbitControls />
-        <directionalLight
-          castShadow
-          position={[200, 200, -40]}
-          intensity={2}
-          shadow-mapSize-width={4096}
-          shadow-mapSize-height={4096}
-          shadow-camera-left={-250}
-          shadow-camera-right={300}
-          shadow-camera-top={200}
-          shadow-camera-bottom={-200}
-        />
-        <ambientLight intensity={2.7} />
+        <Lights />
         <Suspense fallback={<LoadingScreen />}>
           <Physics gravity={[0, -40, 0]}>
             <World />
