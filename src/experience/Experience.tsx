@@ -62,7 +62,7 @@ const Experience: React.FC = () => {
         }}
       >
         <Perf position="top-left" />
-        <color attach="background" args={["#aec972"]} />
+        <color attach="background" args={["#3C9330"]} />
         <OrbitControls />
         <Lights />
         <Suspense fallback={<LoadingScreen />}>

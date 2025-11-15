@@ -53,6 +53,8 @@ export const Lights: React.FC = () => {
         shadow-camera-right={300}
         shadow-camera-top={200}
         shadow-camera-bottom={-200}
+        shadow-normalBias={0.2}
+        shadow-bias={-0.0005}
       />
       <ambientLight ref={ambientRef} intensity={0.9} />
     </>
