@@ -3,6 +3,7 @@ import { useState, useMemo } from "react";
 import { ThreeEvent } from "@react-three/fiber";
 import { Mesh } from "three";
 import type { ComponentProps } from "react";
+import { useAudioStore } from "../store/useAudioStore";
 
 type InteractiveModelProps = {
   path: string;
@@ -17,6 +18,7 @@ const InteractiveModel: React.FC<InteractiveModelProps> = ({
   useGLTF.preload(path);
   const { scene } = useGLTF(path);
   const [hovered, setHovered] = useState(false);
+  const playSound = useAudioStore((s) => s.playSound);
 
   useCursor(hovered && !!onClick);
 
@@ -31,6 +33,13 @@ const InteractiveModel: React.FC<InteractiveModelProps> = ({
     return clone;
   }, [scene]);
 
+  const handleOnClick = (e: any) => {
+    if (onClick) {
+      onClick(e);
+    }
+    playSound("interactionSFX");
+  };
+
   return (
     <primitive
       object={clonedScene}
@@ -38,7 +47,7 @@ const InteractiveModel: React.FC<InteractiveModelProps> = ({
         e.stopPropagation(), setHovered(true)
       )}
       onPointerOut={() => setHovered(false)}
-      onClick={onClick}
+      onClick={handleOnClick}
       {...props}
     />
   );

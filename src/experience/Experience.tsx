@@ -12,11 +12,13 @@ import Dog from "../components/Dog";
 import Colliders from "../components/Colliders";
 import { Perf } from "r3f-perf";
 import { Lights } from "./Lights";
+import { useAudioStore } from "../store/useAudioStore";
 
 const Experience: React.FC = () => {
   const [zoom, setZoom] = useState(20);
-
+  const playSound = useAudioStore((s) => s.playSound);
   useEffect(() => {
+    playSound("backgroundMusic");
     const updateZoom = () => {
       const width = window.innerWidth;
 

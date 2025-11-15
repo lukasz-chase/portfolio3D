@@ -8,6 +8,7 @@
     "build": "vite build"
   },
   "devDependencies": {
+    "@types/howler": "^2.2.12",
     "@types/react-dom": "^19.2.2",
     "@vitejs/plugin-react": "5.1",
     "vite": "^7.1.12",

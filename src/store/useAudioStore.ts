@@ -3,7 +3,7 @@ import { Howl } from "howler";
 
 export type SoundId =
   | "backgroundMusic"
-  | "projectsSFX"
+  | "interactionSFX"
   | "pokemonSFX"
   | "jumpSFX";
 
@@ -11,11 +11,11 @@ const sounds: Record<SoundId, Howl> = {
   backgroundMusic: new Howl({
     src: ["./sfx/music.ogg"],
     loop: true,
-    volume: 0.3,
+    volume: 0.1,
     preload: true,
   }),
-  projectsSFX: new Howl({
-    src: ["./sfx/projects.ogg"],
+  interactionSFX: new Howl({
+    src: ["./sfx/interaction.ogg"],
     volume: 0.5,
     preload: true,
   }),
@@ -26,7 +26,7 @@ const sounds: Record<SoundId, Howl> = {
   }),
   jumpSFX: new Howl({
     src: ["./sfx/jumpsfx.ogg"],
-    volume: 1.0,
+    volume: 0.6,
     preload: true,
   }),
 };

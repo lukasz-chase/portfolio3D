@@ -101,7 +101,30 @@ const ThemeAudioButtons: React.FC = () => {
         </svg>
       </button>
       <button className="audio-toggle-button" onClick={toggleMute}>
-        {isMuted ? "Unmute" : "Mute"}
+        {isMuted ? (
+          <svg viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg">
+            <rect x="4" y="20" width="20" height="24" fill="white" />
+            <rect x="24" y="16" width="10" height="32" fill="white" />
+            <rect x="34" y="12" width="8" height="40" fill="white" />
+
+            <rect x="46" y="22" width="6" height="6" fill="white" />
+            <rect x="58" y="22" width="6" height="6" fill="white" />
+
+            <rect x="52" y="28" width="6" height="6" fill="white" />
+
+            <rect x="46" y="34" width="6" height="6" fill="white" />
+            <rect x="58" y="34" width="6" height="6" fill="white" />
+          </svg>
+        ) : (
+          <svg viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg">
+            <rect x="4" y="20" width="20" height="24" fill="white" />
+            <rect x="24" y="16" width="10" height="32" fill="white" />
+            <rect x="34" y="12" width="8" height="40" fill="white" />
+
+            <rect x="46" y="22" width="6" height="20" fill="white" />
+            <rect x="54" y="18" width="6" height="28" fill="white" />
+          </svg>
+        )}
       </button>
     </div>
   );
