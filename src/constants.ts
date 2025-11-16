@@ -34,7 +34,7 @@ export const MODAL_CONTENT: Record<ModalId, ModalContent> = {
   [MODAL_IDS.PROJECT_HANGMAN]: {
     title: "Realtime Hangman",
     content:
-      "Multiplayer Hangman built as my engineering thesis project (praca inżynierska). Realtime gameplay, persistent scores and a modern, responsive UI.",
+      "Multiplayer Hangman built as my engineering thesis project. Realtime gameplay, persistent scores and a modern, responsive UI.",
     techStack: ["Next.js", "Tailwind", "Prisma", "WebSockets"],
     github: "https://github.com/lukasz-chase/truegrind",
     website: "https://example.com/",

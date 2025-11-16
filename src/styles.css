@@ -44,3 +44,9 @@ body,
   pointer-events: none;
   transition: opacity 0.5s ease-out;
 }
+
+@media (max-width: 1250px) {
+  html {
+    font-size: 10px;
+  }
+}
