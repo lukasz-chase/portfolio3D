@@ -96,17 +96,23 @@ body,
   background: #00000033;
   border: 2px solid #fff;
   color: #fff;
-  padding: 4px 10px;
+  padding: 4px; /* equal padding = nice centering */
   cursor: pointer;
-  font-weight: 600;
-  font-size: 16px;
+  font-size: 0; /* kill any text spacing */
   line-height: 1;
   image-rendering: pixelated;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.modal-exit-icon {
+  display: block;
 }
 
 .modal-exit-button:hover {
   background: #fff;
-  color: var(--default-bg);
+  color: var(--default-bg); /* X color flips because of currentColor */
 }
 
 .modal-content-wrapper {
@@ -137,6 +143,91 @@ body,
 .modal-project-visit-button:hover {
   background: var(--default-bg);
   color: #fff;
+}
+
+.modal-section {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.modal-section-label {
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  opacity: 0.9;
+}
+
+.modal-project-tech-stack {
+  list-style: none;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  padding: 0;
+  margin: 0;
+}
+
+.modal-pill {
+  background: #00000033;
+  border: 2px solid #ffffff;
+  padding: 4px 8px;
+  font-size: 13px;
+  image-rendering: pixelated;
+}
+
+.modal-actions-row {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.modal-timeline-card {
+  padding: 8px 10px;
+  border-left: 3px solid #ffffff;
+  background: #00000022;
+}
+
+.modal-timeline-role {
+  font-size: 16px;
+  font-weight: 700;
+  margin-bottom: 4px;
+}
+
+.modal-timeline-meta {
+  font-size: 14px;
+  line-height: 1.4;
+}
+
+.modal-about-text {
+  font-size: 16px;
+  line-height: 1.5;
+}
+
+.modal-exp-card {
+  padding: 12px 14px;
+  background: #00000022;
+  border: 2px solid #fff;
+  box-shadow: 0 0 0 3px #00000033;
+  image-rendering: pixelated;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.modal-exp-company {
+  font-size: 20px;
+  font-weight: 700;
+  text-shadow: 2px 2px #00000055;
+}
+
+.modal-exp-period {
+  font-size: 14px;
+  opacity: 0.85;
+}
+
+.modal-exp-role {
+  font-size: 16px;
+  line-height: 1.3;
 }
 
 /* Mobile controls */

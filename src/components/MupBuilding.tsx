@@ -10,7 +10,7 @@ const MupBuilding: React.FC = () => {
   return (
     <InteractiveModel
       path={path}
-      onClick={() => openModal(MODAL_IDS.LUKASZVILE)}
+      onClick={() => openModal(MODAL_IDS.MUP_BUILDING)}
     />
   );
 };
