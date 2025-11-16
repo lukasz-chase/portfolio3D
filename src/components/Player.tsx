@@ -31,8 +31,8 @@ export const Player: React.FC = () => {
   const isOnFloorRef = useRef(false);
   const initPosition = {
     x: 121,
-    y: 2,
-    z: -4,
+    y: 1,
+    z: 0,
   };
 
   const [, getKeys] = useKeyboardControls();
@@ -137,13 +137,13 @@ export const Player: React.FC = () => {
     const camTarget = new THREE.Vector3(
       translation.x + 98 - 20,
       50,
-      translation.z + 30
+      translation.z + 25
     );
     camera.position.lerp(camTarget, 0.1);
     camera.lookAt(
       translation.x + 10,
       camera.position.y - 39,
-      translation.z + 10
+      translation.z + 5
     );
 
     // Respawn if falling
@@ -165,7 +165,7 @@ export const Player: React.FC = () => {
   return (
     <RigidBody
       ref={bodyRef}
-      colliders="ball"
+      colliders="cuboid"
       mass={1}
       position={[initPosition.x, initPosition.y, initPosition.z]}
       enabledRotations={[false, false, false]}

@@ -24,7 +24,7 @@ const Dog: React.FC = () => {
     useShallow((s) => ({ moveSpeed: s.moveSpeed, jumpHeight: s.jumpHeight }))
   );
 
-  const initPosition = { x: 122, y: 2, z: 5 };
+  const initPosition = { x: 126, y: 2, z: -6 };
   const bodyRef = useRef<RapierRigidBody | null>(null);
   const isOnFloorRef = useRef(false);
   const movementDirection = useRef(new THREE.Vector3());
