@@ -11,13 +11,11 @@ import Dog from "../components/Dog";
 import Colliders from "../components/Colliders";
 import { Perf } from "r3f-perf";
 import { Lights } from "./Lights";
-import { useGameStore } from "../store/useGameStore";
 import LoadingScreen from "../ui/LoadingScreen/LoadingScreen";
 import { Loader } from "../ui/LoadingScreen/Loader";
 
 const Experience: React.FC = () => {
   const [zoom, setZoom] = useState(20);
-  const hasStarted = useGameStore((s) => s.hasStarted);
 
   useEffect(() => {
     const updateZoom = () => {
@@ -69,7 +67,11 @@ const Experience: React.FC = () => {
         >
           <Perf position="top-left" />
           <color attach="background" args={["#3C9330"]} />
-          <OrbitControls />
+          <OrbitControls
+            enableDamping={false}
+            enablePan={false}
+            enableRotate={false}
+          />
           <Lights />
           <Suspense fallback={<Loader />}>
             <Physics gravity={[0, -40, 0]}>
