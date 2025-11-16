@@ -13,6 +13,7 @@ import { Perf } from "r3f-perf";
 import { Lights } from "./Lights";
 import { useGameStore } from "../store/useGameStore";
 import LoadingScreen from "../ui/LoadingScreen/LoadingScreen";
+import { Loader } from "../ui/LoadingScreen/Loader";
 
 const Experience: React.FC = () => {
   const [zoom, setZoom] = useState(20);
@@ -70,19 +71,17 @@ const Experience: React.FC = () => {
           <color attach="background" args={["#3C9330"]} />
           <OrbitControls />
           <Lights />
-          <Suspense fallback={null}>
-            {hasStarted && (
-              <Physics gravity={[0, -40, 0]}>
-                <World />
-                <Player />
-                <Dog />
-                <Colliders />
-                <Interactables />
-              </Physics>
-            )}
+          <Suspense fallback={<Loader />}>
+            <Physics gravity={[0, -40, 0]}>
+              <World />
+              <Player />
+              <Dog />
+              <Colliders />
+              <Interactables />
+            </Physics>
           </Suspense>
         </Canvas>
-        {hasStarted && <ControlsOverlay />}
+        <ControlsOverlay />
       </KeyboardControls>
     </>
   );
