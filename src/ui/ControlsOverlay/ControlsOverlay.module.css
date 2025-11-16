@@ -1,0 +1,48 @@
+.root {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+.control {
+  z-index: 500;
+  position: absolute;
+  top: 85%;
+  left: 50%;
+  cursor: pointer;
+  transform: translate(-50%, -50%);
+  background: var(--default-bg);
+  height: 64px;
+  width: 64px;
+  display: none;
+  justify-content: center;
+  align-items: center;
+  border: 3px solid #ffffff;
+  padding: 8px;
+  transition: background 0.4s ease-in;
+  transition-delay: 0.1s;
+  pointer-events: auto;
+}
+
+.up {
+  transform: translate(-50%, calc(-100% - 32px)) rotate(0deg);
+}
+
+.down {
+  transform: translate(-50%, 32px) rotate(180deg);
+}
+
+.left {
+  transform: translate(calc(-100% - 32px), -50%) rotate(270deg);
+}
+
+.right {
+  transform: translate(32px, -50%) rotate(90deg);
+}
+
+/* show on mobile / tablet */
+@media (max-width: 1100px) {
+  .control {
+    display: flex;
+  }
+}

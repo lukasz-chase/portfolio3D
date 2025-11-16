@@ -1,6 +1,7 @@
 import { useCallback } from "react";
-import { useAudioStore } from "../store/useAudioStore";
-import { useThemeStore } from "../store/useThemeStore";
+import { useAudioStore } from "../../store/useAudioStore";
+import { useThemeStore } from "../../store/useThemeStore";
+import styles from "./ThemeAudioButtons.module.css";
 
 const ThemeAudioButtons: React.FC = () => {
   const isMuted = useAudioStore((s) => s.isMuted);
@@ -23,13 +24,17 @@ const ThemeAudioButtons: React.FC = () => {
   }, [setIsDark]);
 
   return (
-    <div className="ui-buttons">
-      <button className="theme-mode-toggle-button" onClick={toggleTheme}>
+    <div className={styles.root}>
+      {/* THEME BUTTON */}
+      <button
+        className={`${styles.button} ${styles.themeButton}`}
+        onClick={toggleTheme}
+      >
         <svg
           width="80"
           height="80"
           viewBox="0 0 80 80"
-          className="first-icon"
+          className={styles.iconPrimary}
           fill="none"
           xmlns="http://www.w3.org/2000/svg"
         >
@@ -88,7 +93,7 @@ const ThemeAudioButtons: React.FC = () => {
           width="46"
           height="46"
           viewBox="0 0 46 46"
-          className="second-icon"
+          className={styles.iconSecondary}
           fill="none"
           xmlns="http://www.w3.org/2000/svg"
         >
@@ -100,8 +105,14 @@ const ThemeAudioButtons: React.FC = () => {
           />
         </svg>
       </button>
-      <button className="audio-toggle-button" onClick={toggleMute}>
+
+      {/* AUDIO BUTTON */}
+      <button
+        className={`${styles.button} ${styles.audioButton}`}
+        onClick={toggleMute}
+      >
         {isMuted ? (
+          // muted icon
           <svg viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg">
             <rect x="4" y="20" width="20" height="24" fill="white" />
             <rect x="24" y="16" width="10" height="32" fill="white" />
@@ -116,6 +127,7 @@ const ThemeAudioButtons: React.FC = () => {
             <rect x="58" y="34" width="6" height="6" fill="white" />
           </svg>
         ) : (
+          // sound on icon
           <svg viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg">
             <rect x="4" y="20" width="20" height="24" fill="white" />
             <rect x="24" y="16" width="10" height="32" fill="white" />
@@ -129,4 +141,5 @@ const ThemeAudioButtons: React.FC = () => {
     </div>
   );
 };
+
 export default ThemeAudioButtons;

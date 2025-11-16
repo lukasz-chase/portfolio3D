@@ -1,5 +1,6 @@
 import { useEffect, useRef } from "react";
-import { type Direction, useInputStore } from "../store/useInputStore";
+import { type Direction, useInputStore } from "../../store/useInputStore";
+import styles from "./ControlsOverlay.module.css";
 
 const ControlsOverlay: React.FC = () => {
   const setPressed = useInputStore((s) => s.setPressed);
@@ -10,7 +11,7 @@ const ControlsOverlay: React.FC = () => {
   const rightRef = useRef<HTMLButtonElement>(null);
 
   useEffect(() => {
-    const eventOptions = { passive: false };
+    const eventOptions: AddEventListenerOptions = { passive: false };
 
     const buttons = [
       { ref: upRef, dir: "up" as Direction },
@@ -19,7 +20,7 @@ const ControlsOverlay: React.FC = () => {
       { ref: rightRef, dir: "right" as Direction },
     ];
 
-    const cleanupFunctions: (() => void)[] = [];
+    const cleanups: (() => void)[] = [];
 
     buttons.forEach(({ ref, dir }) => {
       const el = ref.current;
@@ -44,21 +45,22 @@ const ControlsOverlay: React.FC = () => {
       el.addEventListener("touchend", handleTouchEnd, eventOptions);
       el.addEventListener("touchcancel", handleTouchCancel, eventOptions);
 
-      cleanupFunctions.push(() => {
-        el.removeEventListener("touchstart", handleTouchStart);
-        el.removeEventListener("touchend", handleTouchEnd);
-        el.removeEventListener("touchcancel", handleTouchCancel);
+      cleanups.push(() => {
+        el.removeEventListener("touchstart", handleTouchStart, eventOptions);
+        el.removeEventListener("touchend", handleTouchEnd, eventOptions);
+        el.removeEventListener("touchcancel", handleTouchCancel, eventOptions);
       });
     });
 
     return () => {
-      cleanupFunctions.forEach((cleanup) => cleanup());
+      cleanups.forEach((fn) => fn());
     };
-  }, []);
+  }, [setPressed]);
 
   return (
-    <div className="mobile-controls">
-      <button ref={upRef} className="mobile-control up-arrow">
+    <div className={styles.root}>
+      <button ref={upRef} className={`${styles.control} ${styles.up}`}>
+        {/* up SVG */}
         <svg
           width="45"
           height="34"
@@ -116,7 +118,8 @@ const ControlsOverlay: React.FC = () => {
         </svg>
       </button>
 
-      <button ref={leftRef} className="mobile-control left-arrow">
+      <button ref={leftRef} className={`${styles.control} ${styles.left}`}>
+        {/* left SVG (same shape, rotated by CSS) */}
         <svg
           width="45"
           height="34"
@@ -174,7 +177,8 @@ const ControlsOverlay: React.FC = () => {
         </svg>
       </button>
 
-      <button ref={rightRef} className="mobile-control right-arrow">
+      <button ref={rightRef} className={`${styles.control} ${styles.right}`}>
+        {/* right SVG */}
         <svg
           width="45"
           height="34"
@@ -232,7 +236,8 @@ const ControlsOverlay: React.FC = () => {
         </svg>
       </button>
 
-      <button ref={downRef} className="mobile-control down-arrow">
+      <button ref={downRef} className={`${styles.control} ${styles.down}`}>
+        {/* down SVG */}
         <svg
           width="45"
           height="34"

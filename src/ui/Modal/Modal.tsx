@@ -1,6 +1,7 @@
 import React from "react";
-import { useModalStore } from "../store/useModalStore";
-import { MODAL_CONTENT } from "../constants";
+import { MODAL_CONTENT } from "../../constants";
+import styles from "./Modal.module.css";
+import { useModalStore } from "../../store/useModalStore";
 
 const Modal: React.FC = () => {
   const activeId = useModalStore((s) => s.activeId);
@@ -14,25 +15,25 @@ const Modal: React.FC = () => {
       case "project":
         return (
           <>
-            <p className="modal-project-description">{content.content}</p>
+            <p className={styles.description}>{content.content}</p>
 
             {content.techStack && (
-              <div className="modal-section">
-                <span className="modal-section-label">Tech</span>
-                <ul className="modal-project-tech-stack">
+              <section>
+                <span className={styles.sectionLabel}>Tech</span>
+                <ul className={styles.techStack}>
                   {content.techStack.map((tech) => (
-                    <li key={tech} className="modal-pill">
+                    <li key={tech} className={styles.pill}>
                       {tech}
                     </li>
                   ))}
                 </ul>
-              </div>
+              </section>
             )}
 
-            <div className="modal-actions-row">
+            <div className={styles.actionsRow}>
               {content.github && (
                 <a
-                  className="modal-project-visit-button"
+                  className={styles.primaryButton}
                   href={content.github}
                   target="_blank"
                   rel="noreferrer"
@@ -42,7 +43,7 @@ const Modal: React.FC = () => {
               )}
               {content.website && (
                 <a
-                  className="modal-project-visit-button"
+                  className={styles.primaryButton}
                   href={content.website}
                   target="_blank"
                   rel="noreferrer"
@@ -57,17 +58,17 @@ const Modal: React.FC = () => {
       case "experience":
       case "education":
         return (
-          <div className="modal-exp-card">
-            <h3 className="modal-exp-company">{content.company}</h3>
-            <p className="modal-exp-period">{content.period}</p>
-            <p className="modal-exp-role">{content.role}</p>
+          <div className={styles.expCard}>
+            <h3 className={styles.expCompany}>{content.company}</h3>
+            <p className={styles.expPeriod}>{content.period}</p>
+            <p className={styles.expRole}>{content.role}</p>
           </div>
         );
 
       case "about":
       default:
         return (
-          <p className="modal-project-description modal-about-text">
+          <p className={`${styles.description} ${styles.aboutText}`}>
             {content.content}
           </p>
         );
@@ -76,16 +77,16 @@ const Modal: React.FC = () => {
 
   return (
     <>
-      <div className="modal-bg-overlay" onClick={closeModal} />
-      <div className="modal">
-        <div className="modal-wrapper">
-          <div className="modal-header">
-            <h2 className="modal-title">{content.title}</h2>
-            <button className="modal-exit-button" onClick={closeModal}>
+      <div className={styles.overlay} onClick={closeModal} />
+      <div className={styles.modal}>
+        <div className={styles.wrapper}>
+          <div className={styles.header}>
+            <h2 className={styles.title}>{content.title}</h2>
+            <button className={styles.exitButton} onClick={closeModal}>
               <svg
                 xmlns="http://www.w3.org/2000/svg"
-                width="16px"
-                height="16px"
+                width="24px"
+                height="24px"
                 viewBox="0 0 24 24"
                 fill="none"
               >
@@ -96,7 +97,7 @@ const Modal: React.FC = () => {
               </svg>
             </button>
           </div>
-          <div className="modal-content-wrapper">{renderBody()}</div>
+          <div className={styles.content}>{renderBody()}</div>
         </div>
       </div>
     </>

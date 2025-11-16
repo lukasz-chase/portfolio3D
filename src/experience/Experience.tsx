@@ -4,15 +4,15 @@ import * as THREE from "three";
 import { World } from "./World";
 import { Player } from "../components/Player";
 import { Interactables } from "./Interactables";
-import LoadingScreen from "../ui/LoadingScreen";
 import { Physics } from "@react-three/rapier";
 import { KeyboardControls, OrbitControls } from "@react-three/drei";
-import ControlsOverlay from "../ui/ControlsOverlay";
+import ControlsOverlay from "../ui/ControlsOverlay/ControlsOverlay";
 import Dog from "../components/Dog";
 import Colliders from "../components/Colliders";
 import { Perf } from "r3f-perf";
 import { Lights } from "./Lights";
-import { useGameStore } from "../ui/useGameStore";
+import { useGameStore } from "../store/useGameStore";
+import LoadingScreen from "../ui/LoadingScreen/LoadingScreen";
 
 const Experience: React.FC = () => {
   const [zoom, setZoom] = useState(20);
