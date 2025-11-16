@@ -11,7 +11,7 @@ import Dog from "../components/Dog";
 import Colliders from "../components/Colliders";
 import { Lights } from "./Lights";
 import LoadingScreen from "../ui/LoadingScreen/LoadingScreen";
-import { Loader } from "../ui/LoadingScreen/Loader";
+import LoadingDone from "../ui/LoadingScreen/LoadingDone";
 
 const Experience: React.FC = () => {
   const [zoom, setZoom] = useState(20);
@@ -71,7 +71,8 @@ const Experience: React.FC = () => {
             enableRotate={false}
           />
           <Lights />
-          <Suspense fallback={<Loader />}>
+          <Suspense fallback={null}>
+            <LoadingDone />
             <Physics gravity={[0, -40, 0]}>
               <World />
               <Player />

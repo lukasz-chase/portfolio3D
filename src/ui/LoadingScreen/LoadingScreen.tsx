@@ -1,11 +1,14 @@
 import styles from "./LoadingScreen.module.css";
 import { useGameStore } from "../../store/useGameStore";
+import { useAudioStore } from "../../store/useAudioStore";
 
 export const LoadingScreen: React.FC = () => {
   const { hasStarted, setHasStarted, isLoaded } = useGameStore();
+  const playSound = useAudioStore((s) => s.playSound);
 
   const handleStart = () => {
     setHasStarted(true);
+    playSound("backgroundMusic");
   };
 
   return (
