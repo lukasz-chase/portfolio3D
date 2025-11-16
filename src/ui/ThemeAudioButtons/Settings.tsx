@@ -1,4 +1,4 @@
-import { useCallback, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { useAudioStore } from "../../store/useAudioStore";
 import { useGameStore } from "../../store/useGameStore";
 import { useThemeStore } from "../../store/useThemeStore";
@@ -18,20 +18,15 @@ export const Settings: React.FC = () => {
   const jumpHeight = useGameStore((s) => s.jumpHeight);
   const setJumpHeight = useGameStore((s) => s.setJumpHeight);
 
-  const toggleTheme = useCallback(() => {
+  useEffect(() => {
     const body = document.body;
-    const currentlyDark = body.classList.contains("dark-theme");
+    body.classList.remove("light-theme", "dark-theme");
+    body.classList.add(isDark ? "dark-theme" : "light-theme");
+  }, [isDark]);
 
-    if (currentlyDark) {
-      body.classList.remove("dark-theme");
-      body.classList.add("light-theme");
-    } else {
-      body.classList.remove("light-theme");
-      body.classList.add("dark-theme");
-    }
-
-    setIsDark(!currentlyDark);
-  }, [setIsDark]);
+  const toggleTheme = useCallback(() => {
+    setIsDark(!isDark);
+  }, [isDark, setIsDark]);
 
   return (
     <div className={styles.root}>
