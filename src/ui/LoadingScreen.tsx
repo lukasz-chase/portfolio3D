@@ -1,13 +1,28 @@
-import { Html, useProgress } from "@react-three/drei";
+import { useAudioStore } from "../store/useAudioStore";
+import { useGameStore } from "./useGameStore";
 
-export const LoadingScreen: React.FC = () => {
-  const { progress } = useProgress();
+const LoadingScreen: React.FC = () => {
+  const { hasStarted, setHasStarted } = useGameStore();
+  const playSound = useAudioStore((s) => s.playSound);
+
+  const handleStart = () => {
+    setHasStarted(true);
+    playSound("backgroundMusic");
+  };
 
   return (
-    <Html center>
-      <div className="loading-screen">
-        <p className="loading-text">Loading {progress.toFixed(0)}%</p>
+    <div className={`loading-screen ${hasStarted ? "hidden" : ""}`}>
+      <div className="loading-screen__content">
+        <h1 className="loading-screen__title">Loading...</h1>
+        <p className="loading-screen__instructions">
+          Use WASD/Arrow keys to move
+        </p>
+        <button className="loading-screen__play-button" onClick={handleStart}>
+          Play
+        </button>
       </div>
-    </Html>
+    </div>
   );
 };
+
+export default LoadingScreen;
