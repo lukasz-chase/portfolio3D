@@ -16,7 +16,8 @@ export const LoadingScreen: React.FC = () => {
       <div className={styles.content}>
         {isLoaded ? (
           <>
-            <p className={styles.instructions}>Use WASD/Arrow keys to move</p>
+            <p className={styles.instructions}>Use WSAD/Arrow keys to move</p>
+            <p className={styles.instructions}>Press objects to interact</p>
             <button className={styles.playButton} onClick={handleStart}>
               Play
             </button>
