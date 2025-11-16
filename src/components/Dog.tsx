@@ -9,7 +9,8 @@ import {
 import * as THREE from "three";
 import { useShallow } from "zustand/shallow";
 import { usePlayerStore } from "../store/usePlayerStore";
-import { JUMP_SPEED, MOVE_SPEED } from "../constants";
+import { JUMP_HEIGHT, MOVE_SPEED } from "../constants";
+import { useGameStore } from "../store/useGameStore";
 
 const Dog: React.FC = () => {
   const { scene } = useGLTF("/models/Dog.glb");
@@ -18,6 +19,9 @@ const Dog: React.FC = () => {
       playerPosition: s.position,
       playerHasMoved: s.hasMoved,
     }))
+  );
+  const { moveSpeed, jumpHeight } = useGameStore(
+    useShallow((s) => ({ moveSpeed: s.moveSpeed, jumpHeight: s.jumpHeight }))
   );
 
   const initPosition = { x: 122, y: 2, z: 5 };
@@ -70,7 +74,7 @@ const Dog: React.FC = () => {
       const desiredDirection = directionToPlayer.clone().normalize();
 
       if (isOnFloorRef.current) {
-        body.setLinvel({ x: 0, y: JUMP_SPEED, z: 0 }, true);
+        body.setLinvel({ x: 0, y: JUMP_HEIGHT * jumpHeight, z: 0 }, true);
       }
       // Add some randomness to the path
       const sideways = new THREE.Vector3(
@@ -85,9 +89,9 @@ const Dog: React.FC = () => {
 
       body.setLinvel(
         {
-          x: movementDirection.current.x * MOVE_SPEED,
+          x: movementDirection.current.x * MOVE_SPEED * moveSpeed,
           y: body.linvel().y,
-          z: movementDirection.current.z * MOVE_SPEED,
+          z: movementDirection.current.z * MOVE_SPEED * moveSpeed,
         },
         true
       );

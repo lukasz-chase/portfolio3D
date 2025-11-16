@@ -7,8 +7,8 @@ import { useAudioStore } from "../store/useAudioStore";
 import { useInputStore } from "../store/useInputStore";
 import { useShallow } from "zustand/shallow";
 import { usePlayerStore } from "../store/usePlayerStore";
-import { useControls } from "leva";
-import { JUMP_SPEED, MOVE_SPEED } from "../constants";
+import { JUMP_HEIGHT, MOVE_SPEED } from "../constants";
+import { useGameStore } from "../store/useGameStore";
 
 export const Player: React.FC = () => {
   const { camera } = useThree();
@@ -22,11 +22,9 @@ export const Player: React.FC = () => {
     }))
   );
   const { isMuted, playSound } = useAudioStore();
-
-  const { moveSpeed, jumpSpeed } = useControls("Player", {
-    moveSpeed: { value: MOVE_SPEED, min: 0, max: 100, step: 1 },
-    jumpSpeed: { value: JUMP_SPEED, min: 0, max: 100, step: 1 },
-  });
+  const { moveSpeed, jumpHeight } = useGameStore(
+    useShallow((s) => ({ moveSpeed: s.moveSpeed, jumpHeight: s.jumpHeight }))
+  );
 
   const bodyRef = useRef<RapierRigidBody | null>(null);
   const targetYawRef = useRef(-Math.PI / 2);
@@ -101,14 +99,14 @@ export const Player: React.FC = () => {
       dir.normalize();
 
       // Base horizontal velocity
-      const baseX = dir.x * moveSpeed;
-      const baseZ = dir.z * moveSpeed;
+      const baseX = dir.x * MOVE_SPEED * moveSpeed;
+      const baseZ = dir.z * MOVE_SPEED * moveSpeed;
       let vy = linvel.y; // keep current vertical velocitysd
 
       // Jump while moving & grounded (your current behaviour)
       if (isOnFloorRef.current) {
         if (!isMuted) playSound("jumpSFX");
-        vy = jumpSpeed;
+        vy = JUMP_HEIGHT * jumpHeight;
       }
 
       body.setLinvel({ x: baseX, y: vy, z: baseZ }, true);

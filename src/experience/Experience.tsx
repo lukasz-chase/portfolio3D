@@ -9,7 +9,6 @@ import { KeyboardControls, OrbitControls } from "@react-three/drei";
 import ControlsOverlay from "../ui/ControlsOverlay/ControlsOverlay";
 import Dog from "../components/Dog";
 import Colliders from "../components/Colliders";
-import { Perf } from "r3f-perf";
 import { Lights } from "./Lights";
 import LoadingScreen from "../ui/LoadingScreen/LoadingScreen";
 import { Loader } from "../ui/LoadingScreen/Loader";
@@ -65,7 +64,6 @@ const Experience: React.FC = () => {
             gl.toneMappingExposure = 1.7;
           }}
         >
-          <Perf position="top-left" />
           <color attach="background" args={["#3C9330"]} />
           <OrbitControls
             enableDamping={false}

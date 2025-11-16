@@ -75,4 +75,4 @@ export const MODAL_CONTENT: Record<ModalId, ModalContent> = {
 };
 
 export const MOVE_SPEED = 35;
-export const JUMP_SPEED = 14;
+export const JUMP_HEIGHT = 14;
