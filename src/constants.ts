@@ -24,7 +24,7 @@ export const MODAL_CONTENT: Record<ModalId, ModalContent> = {
   [MODAL_IDS.PROJECT_LUKASZVILE]: {
     title: "Lukaszvile",
     content:
-      "You’re standing in it 👋 A 3D isometric world that doubles as my portfolio. Built to show how I think about UX, performance and playful interactions in the browser.",
+      "You’re standing in it 👋 A 3D isometric world that doubles as my portfolio. Created from scratch by me in blender, my first take on 3D in web development.",
     techStack: ["React", "react-three/fiber", "drei", "rapier"],
     github: "https://github.com/lukasz-chase/portfolio3D",
     website: "https://lukaszscigaj.pl",
@@ -44,7 +44,7 @@ export const MODAL_CONTENT: Record<ModalId, ModalContent> = {
   [MODAL_IDS.LUKASZVILE]: {
     title: "About Me",
     content:
-      "Hi, I’m Łukasz Ścigaj – a full-stack TypeScript developer from Poland. I enjoy building playful frontends, solid APIs and everything in between.",
+      "Hi, I’m Łukasz Ścigaj – a full-stack TypeScript developer from Poland. I enjoy building playful frontends, solid APIs and everything in between. I like exercising - hence the bench, running and walking my dog, the one that follows you around (Malina).",
     kind: "about",
   },
 

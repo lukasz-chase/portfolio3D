@@ -19,11 +19,11 @@ const Experience: React.FC = () => {
   useEffect(() => {
     const updateZoom = () => {
       const width = window.innerWidth;
-      if (width < 400) setZoom(9);
-      else if (width < 768) setZoom(10);
-      else if (width < 1024) setZoom(11);
-      else if (width < 1600) setZoom(13);
-      else setZoom(15);
+      if (width < 400) setZoom(7);
+      else if (width < 768) setZoom(9);
+      else if (width < 1024) setZoom(10);
+      else if (width < 1600) setZoom(12);
+      else setZoom(14);
     };
 
     updateZoom(); // run on load
