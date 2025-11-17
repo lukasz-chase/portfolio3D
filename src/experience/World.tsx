@@ -1,23 +1,24 @@
 import { useGLTF } from "@react-three/drei";
-import { useEffect } from "react";
+import { useMemo } from "react";
 import * as THREE from "three";
 
 const path = "/models/Scene.glb";
 
-useGLTF.preload(path);
-
 export const World: React.FC = () => {
   const { scene } = useGLTF(path);
 
-  useEffect(() => {
-    scene.traverse((child) => {
+  const processedScene = useMemo(() => {
+    scene.traverse((child: THREE.Object3D) => {
       if ((child as THREE.Mesh).isMesh) {
         const mesh = child as THREE.Mesh;
         mesh.castShadow = true;
         mesh.receiveShadow = true;
       }
     });
+    return scene;
   }, [scene]);
 
-  return <primitive object={scene} />;
+  return <primitive object={processedScene} />;
 };
+
+useGLTF.preload(path);

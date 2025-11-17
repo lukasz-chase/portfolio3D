@@ -1,39 +1,56 @@
+import { useModalStore } from "../store/useModalStore";
+import {
+  LINKS_INTERACTABLES,
+  MODAL_INTERACTABLES,
+  POSTER_INTERACTABLES,
+} from "../constants";
 import Car from "../components/Car";
-import GoodBuilding from "../components/GoodBuilding";
-import KoffeecupBuilding from "../components/KoffeecupBuilding";
-import LukaszvilePoster from "../components/LukaszvilePoster";
-import TruegrindPoster from "../components/TruegrindPoster";
-import GithubText from "../components/GithubText";
-import EmailText from "../components/EmailText";
 import CvText from "../components/CvText";
-import LinkedinText from "../components/LinkedinText";
 import Bench from "../components/Bench";
-import Lukaszvile from "../components/Lukaszvile";
-import HangmanPoster from "../components/HangmanPoster";
-import MupBuilding from "../components/MupBuilding";
+import InteractiveModel from "../components/InteractiveModel";
+import { Float } from "@react-three/drei";
 
 export const Interactables: React.FC = () => {
+  const openModal = useModalStore((store) => store.openModal);
+
   return (
     <>
       <group>
-        <GoodBuilding />
-        <KoffeecupBuilding />
-        <MupBuilding />
+        {MODAL_INTERACTABLES.map(({ path, modalId }) => (
+          <InteractiveModel
+            key={path}
+            path={path}
+            onClick={() => openModal(modalId)}
+          />
+        ))}
       </group>
       <group>
-        <HangmanPoster />
-        <LukaszvilePoster />
-        <TruegrindPoster />
+        {POSTER_INTERACTABLES.map(({ path, modalId }) => (
+          <InteractiveModel
+            key={path}
+            path={path}
+            onClick={() => openModal(modalId)}
+          />
+        ))}
       </group>
       <group>
-        <GithubText />
-        <EmailText />
+        {LINKS_INTERACTABLES.map(({ path, tint, href }) => (
+          <Float
+            rotationIntensity={0}
+            floatIntensity={10}
+            floatingRange={[-0, 0.3]}
+          >
+            <InteractiveModel
+              path={path}
+              tint={tint}
+              onClick={() => window.open(href, "_blank", "noopener,noreferrer")}
+            />
+          </Float>
+        ))}
         <CvText />
-        <LinkedinText />
       </group>
       <Car />
       <Bench />
-      <Lukaszvile />
     </>
   );
 };

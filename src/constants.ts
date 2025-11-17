@@ -17,7 +17,7 @@ export const MODAL_CONTENT: Record<ModalId, ModalContent> = {
       "Mobile workout tracker for people who actually like numbers. Create routines, log sets and follow your progress over time – all in a clean, minimal UI.",
     techStack: ["React Native", "Expo", "Supabase"],
     github: "https://github.com/lukasz-chase/truegrind",
-    website: "https://example.com/",
+    website: "https://truegrind.netlify.app/",
     kind: "project",
   },
 
@@ -27,7 +27,7 @@ export const MODAL_CONTENT: Record<ModalId, ModalContent> = {
       "You’re standing in it 👋 A 3D isometric world that doubles as my portfolio. Built to show how I think about UX, performance and playful interactions in the browser.",
     techStack: ["React", "react-three/fiber", "drei", "rapier"],
     github: "https://github.com/lukasz-chase/portfolio3D",
-    website: "https://example.com/",
+    website: "https://lukaszscigaj.pl",
     kind: "project",
   },
 
@@ -37,7 +37,7 @@ export const MODAL_CONTENT: Record<ModalId, ModalContent> = {
       "Multiplayer Hangman built as my engineering thesis project. Realtime gameplay, persistent scores and a modern, responsive UI.",
     techStack: ["Next.js", "Tailwind", "Prisma", "WebSockets"],
     github: "https://github.com/lukasz-chase/truegrind",
-    website: "https://example.com/",
+    website: "https://wisielec-online.netlify.app/",
     kind: "project",
   },
 
@@ -76,3 +76,45 @@ export const MODAL_CONTENT: Record<ModalId, ModalContent> = {
 
 export const MOVE_SPEED = 35;
 export const JUMP_HEIGHT = 14;
+
+export const MODAL_INTERACTABLES = [
+  { path: "/models/GoodBuilding.glb", modalId: MODAL_IDS.GOOD_BUILDING },
+  {
+    path: "/models/KoffeecupBuilding.glb",
+    modalId: MODAL_IDS.KOFFEECUP_BUILDING,
+  },
+  { path: "/models/MupBuilding.glb", modalId: MODAL_IDS.MUP_BUILDING },
+  { path: "/models/Lukaszvile.glb", modalId: MODAL_IDS.LUKASZVILE },
+];
+
+export const POSTER_INTERACTABLES = [
+  { path: "/models/HangmanPoster.glb", modalId: MODAL_IDS.PROJECT_HANGMAN },
+  {
+    path: "/models/LukaszvilePoster.glb",
+    modalId: MODAL_IDS.PROJECT_LUKASZVILE,
+  },
+  {
+    path: "/models/TruegrindPoster.glb",
+    modalId: MODAL_IDS.PROJECT_TRUEGRIND,
+  },
+];
+export const LINKS_INTERACTABLES = [
+  {
+    path: "/models/LinkedinText.glb",
+    tint: "#9bb8ff",
+    href: "https://www.linkedin.com/in/lukasz-scigaj/",
+    speed: 1.2,
+  },
+  {
+    path: "/models/EmailText.glb",
+    tint: "#ffe8a3",
+    href: "mailto:lukasz.scigaj00@gmail.com",
+    speed: 1,
+  },
+  {
+    path: "/models/GithubText.glb",
+    tint: "#d6c3ff",
+    href: "https://github.com/lukasz-chase",
+    speed: 1.5,
+  },
+];

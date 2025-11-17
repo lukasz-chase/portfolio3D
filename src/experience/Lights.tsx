@@ -46,9 +46,9 @@ export const Lights: React.FC = () => {
         ref={sunRef}
         castShadow
         position={[200, 200, -40]}
-        intensity={1}
-        shadow-mapSize-width={4096}
-        shadow-mapSize-height={4096}
+        intensity={2.5}
+        shadow-mapSize-width={2048}
+        shadow-mapSize-height={2048}
         shadow-camera-left={-250}
         shadow-camera-right={300}
         shadow-camera-top={200}
