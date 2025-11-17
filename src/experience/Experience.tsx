@@ -23,7 +23,7 @@ const Experience: React.FC = () => {
       else if (width < 768) setZoom(10);
       else if (width < 1024) setZoom(11);
       else if (width < 1600) setZoom(13);
-      else setZoom(20);
+      else setZoom(15);
     };
 
     updateZoom(); // run on load

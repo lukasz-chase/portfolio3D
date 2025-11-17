@@ -4,15 +4,18 @@ import { ThreeEvent } from "@react-three/fiber";
 import { Mesh } from "three";
 import type { ComponentProps } from "react";
 import { useAudioStore } from "../store/useAudioStore";
+import * as THREE from "three";
 
 type InteractiveModelProps = {
   path: string;
   onClick?: (event: any) => void;
+  tint?: string;
 } & Omit<ComponentProps<"primitive">, "object" | "onClick">;
 
 const InteractiveModel: React.FC<InteractiveModelProps> = ({
   path,
   onClick,
+  tint,
   ...props
 }) => {
   useGLTF.preload(path);
@@ -26,12 +29,19 @@ const InteractiveModel: React.FC<InteractiveModelProps> = ({
     const clone = scene.clone();
     clone.traverse((child) => {
       if ((child as Mesh).isMesh) {
-        child.castShadow = true;
-        child.receiveShadow = true;
+        const mesh = child as Mesh;
+        mesh.castShadow = true;
+        mesh.receiveShadow = true;
+        if (tint) {
+          const mat = mesh.material as THREE.MeshStandardMaterial;
+
+          // Apply pastel tint
+          mat.color = new THREE.Color(tint);
+        }
       }
     });
     return clone;
-  }, [scene]);
+  }, [scene, tint]);
 
   const handleOnClick = (e: any) => {
     if (onClick) {
