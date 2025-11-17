@@ -1,0 +1,86 @@
+.minimapContainer {
+  position: fixed;
+  top: 20px;
+  left: 20px;
+  z-index: 100;
+  border: 2px solid #fff;
+  background-color: #00000099;
+  image-rendering: pixelated;
+  transform-origin: top left;
+  transform: scale(1);
+  transition: transform 0.18s ease-out;
+}
+
+.expanded {
+  transform: scale(2);
+}
+
+.map {
+  width: 180px;
+  height: 200px;
+  position: relative;
+  background-image: url("/minimap.webp");
+  background-position: center;
+  background-size: contain;
+  background-repeat: no-repeat;
+  overflow: hidden;
+}
+
+.playerDot {
+  position: absolute;
+  width: 10px;
+  height: 10px;
+  background-color: #ff4e4e;
+  border-radius: 50%;
+  border: 1px solid white;
+  transform: translate(-50%, -50%);
+}
+
+.label {
+  position: absolute;
+  color: white;
+  font-size: 14px;
+  text-shadow: -0.5px -0.5px 0 #000, 0.5px -0.5px 0 #000, -0.5px 0.5px 0 #000,
+    0.5px 0.5px 0 #000;
+  font-weight: bold;
+}
+
+.contact {
+  top: 5px;
+  left: 5px;
+}
+
+.experience {
+  top: 5px;
+  right: 5px;
+}
+
+.projects {
+  bottom: 5px;
+  left: 5px;
+}
+
+/* Tablet */
+@media (max-width: 900px) {
+  .minimapContainer {
+    top: 12px;
+    left: 12px;
+  }
+}
+
+/* Small phones */
+@media (max-width: 600px) {
+  .minimapContainer {
+    top: 8px;
+    left: 8px;
+  }
+
+  .label {
+    font-size: 5px;
+  }
+
+  .playerDot {
+    width: 8px;
+    height: 8px;
+  }
+}

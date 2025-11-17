@@ -118,3 +118,10 @@ export const LINKS_INTERACTABLES = [
     speed: 1.5,
   },
 ];
+
+export const WORLD_BOUNDS = {
+  minX: -139.77,
+  maxX: 136.86,
+  minZ: -121.37,
+  maxZ: 121.73,
+};

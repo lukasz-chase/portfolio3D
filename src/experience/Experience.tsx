@@ -12,6 +12,7 @@ import Colliders from "../components/Colliders";
 import { Lights } from "./Lights";
 import LoadingScreen from "../ui/LoadingScreen/LoadingScreen";
 import LoadingDone from "../ui/LoadingScreen/LoadingDone";
+import Minimap from "../ui/Minimap/Minimap";
 
 const Experience: React.FC = () => {
   const [zoom, setZoom] = useState(20);
@@ -35,6 +36,7 @@ const Experience: React.FC = () => {
   return (
     <>
       <LoadingScreen />
+      <Minimap />
       <KeyboardControls
         map={[
           { name: "forward", keys: ["ArrowUp", "KeyW"] },

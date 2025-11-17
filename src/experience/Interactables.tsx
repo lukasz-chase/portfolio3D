@@ -39,6 +39,7 @@ export const Interactables: React.FC = () => {
             rotationIntensity={0}
             floatIntensity={10}
             floatingRange={[-0, 0.3]}
+            key={path}
           >
             <InteractiveModel
               path={path}

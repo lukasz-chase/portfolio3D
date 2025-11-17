@@ -31,7 +31,7 @@ export const Settings: React.FC = () => {
   return (
     <div className={styles.root}>
       <button
-        className={`${styles.button} ${styles.settingsButton}`}
+        className={styles.settingsButton}
         onClick={() => setIsOpen((v) => !v)}
       >
         {/* gear */}
