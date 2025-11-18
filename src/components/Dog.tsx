@@ -9,7 +9,7 @@ import {
 import * as THREE from "three";
 import { useShallow } from "zustand/shallow";
 import { usePlayerStore } from "../store/usePlayerStore";
-import { JUMP_HEIGHT, MOVE_SPEED } from "../constants";
+import { DOG_INIT_POSITION, JUMP_HEIGHT, MOVE_SPEED } from "../constants";
 import { useGameStore } from "../store/useGameStore";
 
 const Dog: React.FC = () => {
@@ -24,7 +24,6 @@ const Dog: React.FC = () => {
     useShallow((s) => ({ moveSpeed: s.moveSpeed, jumpHeight: s.jumpHeight }))
   );
 
-  const initPosition = { x: 126, y: 2, z: -6 };
   const bodyRef = useRef<RapierRigidBody | null>(null);
   const isOnFloorRef = useRef(false);
   const movementDirection = useRef(new THREE.Vector3());
@@ -119,7 +118,7 @@ const Dog: React.FC = () => {
 
     // Respawn if falling
     if (translation.y < -20) {
-      body.setTranslation(initPosition, true);
+      body.setTranslation(DOG_INIT_POSITION, true);
       body.setLinvel({ x: 0, y: 0, z: 0 }, true);
     }
   });
@@ -130,7 +129,7 @@ const Dog: React.FC = () => {
       ref={bodyRef}
       type="dynamic"
       mass={1}
-      position={[initPosition.x, initPosition.y, initPosition.z]}
+      position={[DOG_INIT_POSITION.x, DOG_INIT_POSITION.y, DOG_INIT_POSITION.z]}
       enabledRotations={[false, false, false]}
       linearDamping={1.5}
       friction={1}

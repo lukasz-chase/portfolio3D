@@ -75,7 +75,7 @@ export const MODAL_CONTENT: Record<ModalId, ModalContent> = {
 };
 
 export const MOVE_SPEED = 35;
-export const JUMP_HEIGHT = 14;
+export const JUMP_HEIGHT = 16;
 
 export const MODAL_INTERACTABLES = [
   { path: "/models/GoodBuilding.glb", modalId: MODAL_IDS.GOOD_BUILDING },
@@ -125,3 +125,10 @@ export const WORLD_BOUNDS = {
   minZ: -121.37,
   maxZ: 121.73,
 };
+
+export const PLAYER_INIT_POSITION = {
+  x: 121,
+  y: 1,
+  z: 0,
+};
+export const DOG_INIT_POSITION = { x: 126, y: 2, z: -6 };
