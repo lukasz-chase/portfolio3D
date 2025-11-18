@@ -9,6 +9,7 @@ import CvText from "../components/CvText";
 import Bench from "../components/Bench";
 import InteractiveModel from "../components/InteractiveModel";
 import { Float } from "@react-three/drei";
+import { ProximitySelect } from "../components/Selection";
 
 export const Interactables: React.FC = () => {
   const openModal = useModalStore((store) => store.openModal);
@@ -17,22 +18,20 @@ export const Interactables: React.FC = () => {
     <>
       <group>
         {MODAL_INTERACTABLES.map(({ path, modalId }) => (
-          <InteractiveModel
-            key={path}
-            path={path}
-            onClick={() => openModal(modalId)}
-          />
+          <ProximitySelect key={path} radius={50} enabled>
+            <InteractiveModel path={path} onClick={() => openModal(modalId)} />
+          </ProximitySelect>
         ))}
       </group>
+
       <group>
         {POSTER_INTERACTABLES.map(({ path, modalId }) => (
-          <InteractiveModel
-            key={path}
-            path={path}
-            onClick={() => openModal(modalId)}
-          />
+          <ProximitySelect key={path} radius={50} enabled>
+            <InteractiveModel path={path} onClick={() => openModal(modalId)} />
+          </ProximitySelect>
         ))}
       </group>
+
       <group>
         {LINKS_INTERACTABLES.map(({ path, tint, href }) => (
           <Float
@@ -50,6 +49,7 @@ export const Interactables: React.FC = () => {
         ))}
         <CvText />
       </group>
+
       <Car />
       <Bench />
     </>
