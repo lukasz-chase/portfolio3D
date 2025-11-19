@@ -7,20 +7,35 @@ import { useAudioStore } from "../store/useAudioStore";
 import { useInputStore } from "../store/useInputStore";
 import { useShallow } from "zustand/shallow";
 import { usePlayerStore } from "../store/usePlayerStore";
-import { JUMP_HEIGHT, MOVE_SPEED } from "../constants";
+import { JUMP_HEIGHT, MOVE_SPEED, PLAYER_INIT_POSITION } from "../constants";
 import { useGameStore } from "../store/useGameStore";
 
 export const Player: React.FC = () => {
   const { camera } = useThree();
   const { scene } = useGLTF("/models/Character.glb");
 
-  const { setPlayerPosition, playerHasMoved, setHasMoved } = usePlayerStore(
+  const {
+    setPlayerPosition,
+    playerHasMoved,
+    setHasMoved,
+    teleportTo,
+    setTeleportTo,
+    isUsingBench,
+    setHasMovedFromBench,
+    hasMovedFromBench,
+  } = usePlayerStore(
     useShallow((s) => ({
       setPlayerPosition: s.setPosition,
       playerHasMoved: s.hasMoved,
       setHasMoved: s.setHasMoved,
+      teleportTo: s.teleportTo,
+      setTeleportTo: s.setTeleportTo,
+      isUsingBench: s.isUsingBench,
+      setHasMovedFromBench: s.setHasMovedFromBench,
+      hasMovedFromBench: s.hasMovedFromBench,
     }))
   );
+
   const { isMuted, playSound } = useAudioStore();
   const { moveSpeed, jumpHeight } = useGameStore(
     useShallow((s) => ({ moveSpeed: s.moveSpeed, jumpHeight: s.jumpHeight }))
@@ -30,8 +45,6 @@ export const Player: React.FC = () => {
   const targetYawRef = useRef(-Math.PI / 2);
   const isOnFloorRef = useRef(false);
   const stuckFramesRef = useRef(0);
-
-  const initPosition = { x: 121, y: 1, z: 0 };
 
   const [, getKeys] = useKeyboardControls();
   const virtual = useInputStore((s) => s.pressed);
@@ -56,11 +69,36 @@ export const Player: React.FC = () => {
     const body = bodyRef.current;
     if (!body) return;
 
-    const translation = body.translation();
-    const linvel = body.linvel();
+    if (teleportTo) {
+      body.setTranslation(teleportTo, true);
+      body.setLinvel({ x: 0, y: 0, z: 0 }, true);
+      setTeleportTo(null);
+    }
 
+    const translation = body.translation();
     setPlayerPosition(translation.x, translation.y, translation.z);
 
+    if (teleportTo && isUsingBench) {
+      const q = new THREE.Quaternion();
+      q.setFromEuler(new THREE.Euler(-Math.PI / 2, Math.PI / 2, 0)); // lying on the bench
+      body.setRotation(q, true);
+
+      const camTarget = new THREE.Vector3(
+        translation.x + 98 - 20,
+        50,
+        translation.z + 25
+      );
+      camera.position.lerp(camTarget, 0.1);
+      camera.lookAt(
+        translation.x + 10,
+        camera.position.y - 39,
+        translation.z + 5
+      );
+
+      return;
+    }
+
+    const linvel = body.linvel();
     const { forward, backward, leftward, rightward } = getKeys();
 
     const up = forward || virtual.up;
@@ -85,11 +123,13 @@ export const Player: React.FC = () => {
       dir.z -= 1;
       targetYawRef.current = Math.PI;
     }
-
+    if (up || down || right || left) {
+      if (isUsingBench && !hasMovedFromBench) {
+        setHasMovedFromBench(true);
+      }
+    }
     const hasInput = dir.lengthSq() > 0;
 
-    // --- FLOOR DETECTION (no collisions needed) ---
-    // road is a bit lower than grass, hence the loose 1.5 threshold
     const ON_FLOOR_Y = 1.5;
     const VY_EPS = 0.2; // "almost not moving vertically"
     const onFloor = translation.y < ON_FLOOR_Y && Math.abs(linvel.y) < VY_EPS;
@@ -98,7 +138,7 @@ export const Player: React.FC = () => {
     // --- STUCK DETECTION (pressing into something) ---
     const horizSpeed = Math.hypot(linvel.x, linvel.z);
     const STUCK_SPEED_EPS = 0.25;
-    const STUCK_FRAMES = 3;
+    const STUCK_FRAMES = 2;
 
     if (hasInput && onFloor && horizSpeed < STUCK_SPEED_EPS) {
       stuckFramesRef.current += 1;
@@ -107,7 +147,6 @@ export const Player: React.FC = () => {
     }
 
     const isStuck = stuckFramesRef.current >= STUCK_FRAMES;
-    // -------------------------------------------------
 
     if (hasInput) {
       if (!playerHasMoved) setHasMoved();
@@ -118,7 +157,6 @@ export const Player: React.FC = () => {
       const baseZ = dir.z * MOVE_SPEED * moveSpeed;
       let vy = linvel.y;
 
-      // pogo jump: only while grounded and not stuck
       if (onFloor && !isStuck) {
         if (!isMuted) playSound("jumpSFX");
         vy = JUMP_HEIGHT * jumpHeight;
@@ -157,7 +195,7 @@ export const Player: React.FC = () => {
     );
 
     if (translation.y < -20) {
-      body.setTranslation(initPosition, true);
+      body.setTranslation(PLAYER_INIT_POSITION, true);
       body.setLinvel({ x: 0, y: 0, z: 0 }, true);
     }
   });
@@ -169,8 +207,12 @@ export const Player: React.FC = () => {
       ref={bodyRef}
       colliders="cuboid"
       mass={1}
-      position={[initPosition.x, initPosition.y, initPosition.z]}
-      enabledRotations={[false, false, false]}
+      position={[
+        PLAYER_INIT_POSITION.x,
+        PLAYER_INIT_POSITION.y,
+        PLAYER_INIT_POSITION.z,
+      ]}
+      enabledRotations={[false, true, false]}
       linearDamping={1.5}
       friction={1}
     >

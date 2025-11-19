@@ -1,27 +1,38 @@
 import { create } from "zustand";
-import * as THREE from "three";
+import { PLAYER_INIT_POSITION } from "../constants";
 
-interface PlayerState {
-  position: THREE.Vector3;
-  hasMoved: boolean;
-  jumped: boolean;
+type Vec3 = { x: number; y: number; z: number };
+
+type PlayerState = {
+  position: Vec3;
   setPosition: (x: number, y: number, z: number) => void;
-  setHasMoved: () => void;
-}
 
-export const usePlayerStore = create<PlayerState>((set, get) => ({
-  position: new THREE.Vector3(121, 2, -4),
+  hasMoved: boolean;
+  setHasMoved: () => void;
+
+  teleportTo: Vec3 | null;
+  setTeleportTo: (pos: Vec3 | null) => void;
+
+  isUsingBench: boolean;
+  setIsUsingBench: (value: boolean) => void;
+
+  hasMovedFromBench: boolean;
+  setHasMovedFromBench: (moved: boolean) => void;
+};
+
+export const usePlayerStore = create<PlayerState>((set) => ({
+  position: PLAYER_INIT_POSITION,
+  setPosition: (x, y, z) => set({ position: { x, y, z } }),
+
   hasMoved: false,
-  jumped: false,
-  setPosition: (x, y, z) => {
-    const { position } = get();
-    if (
-      Math.abs(position.x - x) > 0.001 ||
-      Math.abs(position.y - y) > 0.001 ||
-      Math.abs(position.z - z) > 0.001
-    ) {
-      set({ position: new THREE.Vector3(x, y, z) });
-    }
-  },
   setHasMoved: () => set({ hasMoved: true }),
+
+  teleportTo: null,
+  setTeleportTo: (pos) => set({ teleportTo: pos }),
+
+  isUsingBench: false,
+  setIsUsingBench: (value) => set({ isUsingBench: value }),
+
+  hasMovedFromBench: false,
+  setHasMovedFromBench: (moved) => set({ hasMovedFromBench: moved }),
 }));

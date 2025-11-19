@@ -52,7 +52,7 @@ export const useAudioStore = create<AudioState>((set, get) => ({
   },
   playSound: (id) => {
     if (!get().isMuted) {
-      sounds[id]?.play();
+      sounds[id]?.stop().play();
     }
   },
   stopSound: (id) => {
