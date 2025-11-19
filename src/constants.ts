@@ -37,7 +37,7 @@ export const MODAL_CONTENT: Record<ModalId, ModalContent> = {
       "Multiplayer Hangman built as my engineering thesis project. Realtime gameplay, persistent scores and a modern, responsive UI.",
     techStack: ["Next.js", "Tailwind", "Prisma", "WebSockets"],
     github: "https://github.com/lukasz-chase/truegrind",
-    website: "https://wisielec-online.netlify.app/",
+    website: "https://hangmanwoocash.netlify.app/",
     kind: "project",
   },
 
