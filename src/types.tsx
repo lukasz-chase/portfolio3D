@@ -15,3 +15,10 @@ export type ModalContent = {
   period?: string;
   role?: string;
 };
+
+export type SoundId =
+  | "backgroundMusic"
+  | "interactionSFX"
+  | "benchSFX"
+  | "jumpSFX"
+  | "carSFX";
