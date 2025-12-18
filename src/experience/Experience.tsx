@@ -55,7 +55,7 @@ const Experience: React.FC = () => {
         gl={{ antialias: true }}
         onCreated={(state) => {
           const { gl } = state;
-          gl.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+          gl.setPixelRatio(Math.min(window.devicePixelRatio, 1.5));
           gl.shadowMap.enabled = true;
           gl.shadowMap.type = THREE.PCFSoftShadowMap;
           gl.toneMapping = THREE.ACESFilmicToneMapping;

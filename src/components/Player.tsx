@@ -226,11 +226,11 @@ export const Player: React.FC = () => {
       );
       targetQuatRef.current.setFromEuler(targetEulerRef.current);
 
-      const rotAlpha = 1 - Math.exp(-14 * delta);
+      const rotAlpha = 1 - Math.exp(-20 * delta); // increased responsiveness
       curQuatRef.current.slerp(targetQuatRef.current, rotAlpha);
       body.setRotation(curQuatRef.current, true);
     } else {
-      const damping = Math.exp(-6.6 * delta);
+      const damping = Math.exp(-10 * delta); // slightly faster damping
       const lv = tmpLinvelRef.current;
       lv.x = linvel.x * damping;
       lv.y = linvel.y;
@@ -252,7 +252,7 @@ export const Player: React.FC = () => {
       50,
       translation.z + 25
     );
-    const camAlpha = 1 - Math.exp(-6.6 * delta);
+    const camAlpha = 1 - Math.exp(-10 * delta); // Smoother camera lerp, more consistent across framerates
     camera.position.lerp(camTarget, camAlpha);
     camera.lookAt(
       translation.x + 10,

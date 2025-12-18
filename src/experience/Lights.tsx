@@ -47,12 +47,12 @@ export const Lights: React.FC = () => {
         castShadow
         position={[200, 200, -40]}
         intensity={2.5}
-        shadow-mapSize-width={2048}
-        shadow-mapSize-height={2048}
-        shadow-camera-left={-250}
-        shadow-camera-right={300}
-        shadow-camera-top={200}
-        shadow-camera-bottom={-200}
+        shadow-mapSize-width={1024}
+        shadow-mapSize-height={1024}
+        shadow-camera-left={-150}
+        shadow-camera-right={150}
+        shadow-camera-top={150}
+        shadow-camera-bottom={-150}
         shadow-normalBias={0.2}
         shadow-bias={-0.0005}
       />
