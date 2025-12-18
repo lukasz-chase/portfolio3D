@@ -45,6 +45,22 @@ export const Player: React.FC = () => {
   const targetYawRef = useRef(-Math.PI / 2);
   const isOnFloorRef = useRef(false);
   const stuckFramesRef = useRef(0);
+  const lastPosSentTimeRef = useRef(0);
+  const lastPosSentRef = useRef({
+    x: PLAYER_INIT_POSITION.x,
+    y: PLAYER_INIT_POSITION.y,
+    z: PLAYER_INIT_POSITION.z,
+  });
+
+  const dirRef = useRef(new THREE.Vector3());
+  const camTargetRef = useRef(new THREE.Vector3());
+  const benchEulerRef = useRef(new THREE.Euler());
+  const benchQuatRef = useRef(new THREE.Quaternion());
+  const curQuatRef = useRef(new THREE.Quaternion());
+  const targetEulerRef = useRef(new THREE.Euler());
+  const targetQuatRef = useRef(new THREE.Quaternion());
+  const tmpLinvelRef = useRef({ x: 0, y: 0, z: 0 });
+  const tmpAngvelRef = useRef({ x: 0, y: 0, z: 0 });
 
   const [, getKeys] = useKeyboardControls();
   const virtual = useInputStore((s) => s.pressed);
@@ -65,30 +81,62 @@ export const Player: React.FC = () => {
     return clone;
   }, [scene]);
 
-  useFrame(() => {
+  useFrame((state, delta) => {
     const body = bodyRef.current;
     if (!body) return;
 
     if (teleportTo) {
       body.setTranslation(teleportTo, true);
-      body.setLinvel({ x: 0, y: 0, z: 0 }, true);
+      const lv = tmpLinvelRef.current;
+      lv.x = 0;
+      lv.y = 0;
+      lv.z = 0;
+      body.setLinvel(lv, true);
+      setPlayerPosition(teleportTo.x, teleportTo.y, teleportTo.z);
+      lastPosSentRef.current = {
+        x: teleportTo.x,
+        y: teleportTo.y,
+        z: teleportTo.z,
+      };
+      lastPosSentTimeRef.current = state.clock.elapsedTime;
       setTeleportTo(null);
     }
 
     const translation = body.translation();
-    setPlayerPosition(translation.x, translation.y, translation.z);
+
+    // Avoid writing to zustand every frame (reduces React/zustand churn).
+    // Keep the store fresh enough for proximity/interaction checks.
+    const POSITION_SEND_HZ = 15;
+    const MIN_SEND_INTERVAL = 1 / POSITION_SEND_HZ;
+    const elapsed = state.clock.elapsedTime;
+    if (elapsed - lastPosSentTimeRef.current >= MIN_SEND_INTERVAL) {
+      const last = lastPosSentRef.current;
+      const dx = translation.x - last.x;
+      const dy = translation.y - last.y;
+      const dz = translation.z - last.z;
+      if (dx * dx + dy * dy + dz * dz > 0.01 * 0.01) {
+        setPlayerPosition(translation.x, translation.y, translation.z);
+        lastPosSentRef.current = {
+          x: translation.x,
+          y: translation.y,
+          z: translation.z,
+        };
+      }
+      lastPosSentTimeRef.current = elapsed;
+    }
 
     if (teleportTo && isUsingBench) {
-      const q = new THREE.Quaternion();
-      q.setFromEuler(new THREE.Euler(-Math.PI / 2, Math.PI / 2, 0)); // lying on the bench
-      body.setRotation(q, true);
+      benchEulerRef.current.set(-Math.PI / 2, Math.PI / 2, 0); // lying on the bench
+      benchQuatRef.current.setFromEuler(benchEulerRef.current);
+      body.setRotation(benchQuatRef.current, true);
 
-      const camTarget = new THREE.Vector3(
+      const camTarget = camTargetRef.current.set(
         translation.x + 98 - 20,
         50,
         translation.z + 25
       );
-      camera.position.lerp(camTarget, 0.1);
+      const camAlpha = 1 - Math.exp(-6.6 * delta);
+      camera.position.lerp(camTarget, camAlpha);
       camera.lookAt(
         translation.x + 10,
         camera.position.y - 39,
@@ -106,7 +154,7 @@ export const Player: React.FC = () => {
     const left = leftward || virtual.left;
     const right = rightward || virtual.right;
 
-    const dir = new THREE.Vector3(0, 0, 0);
+    const dir = dirRef.current.set(0, 0, 0);
     if (up) {
       dir.x -= 1;
       targetYawRef.current = -Math.PI / 2;
@@ -162,32 +210,50 @@ export const Player: React.FC = () => {
         vy = JUMP_HEIGHT * jumpHeight;
       }
 
-      body.setLinvel({ x: baseX, y: vy, z: baseZ }, true);
+      const lv = tmpLinvelRef.current;
+      lv.x = baseX;
+      lv.y = vy;
+      lv.z = baseZ;
+      body.setLinvel(lv, true);
 
       const MODEL_YAW_OFFSET = Math.PI / 2;
       const q = body.rotation();
-      const curQ = new THREE.Quaternion(q.x, q.y, q.z, q.w);
-      const targetQ = new THREE.Quaternion().setFromEuler(
-        new THREE.Euler(0, targetYawRef.current + MODEL_YAW_OFFSET, 0)
+      curQuatRef.current.set(q.x, q.y, q.z, q.w);
+      targetEulerRef.current.set(
+        0,
+        targetYawRef.current + MODEL_YAW_OFFSET,
+        0
       );
+      targetQuatRef.current.setFromEuler(targetEulerRef.current);
 
-      curQ.slerp(targetQ, 0.2);
-      body.setRotation({ x: curQ.x, y: curQ.y, z: curQ.z, w: curQ.w }, true);
+      const rotAlpha = 1 - Math.exp(-14 * delta);
+      curQuatRef.current.slerp(targetQuatRef.current, rotAlpha);
+      body.setRotation(curQuatRef.current, true);
     } else {
+      const damping = Math.exp(-6.6 * delta);
+      const lv = tmpLinvelRef.current;
+      lv.x = linvel.x * damping;
+      lv.y = linvel.y;
+      lv.z = linvel.z * damping;
       body.setLinvel(
-        { x: linvel.x * 0.9, y: linvel.y, z: linvel.z * 0.9 },
+        lv,
         true
       );
     }
 
-    body.setAngvel({ x: 0, y: 0, z: 0 }, true);
+    const av = tmpAngvelRef.current;
+    av.x = 0;
+    av.y = 0;
+    av.z = 0;
+    body.setAngvel(av, true);
 
-    const camTarget = new THREE.Vector3(
+    const camTarget = camTargetRef.current.set(
       translation.x + 98 - 20,
       50,
       translation.z + 25
     );
-    camera.position.lerp(camTarget, 0.1);
+    const camAlpha = 1 - Math.exp(-6.6 * delta);
+    camera.position.lerp(camTarget, camAlpha);
     camera.lookAt(
       translation.x + 10,
       camera.position.y - 39,
@@ -196,7 +262,11 @@ export const Player: React.FC = () => {
 
     if (translation.y < -20) {
       body.setTranslation(PLAYER_INIT_POSITION, true);
-      body.setLinvel({ x: 0, y: 0, z: 0 }, true);
+      const lv = tmpLinvelRef.current;
+      lv.x = 0;
+      lv.y = 0;
+      lv.z = 0;
+      body.setLinvel(lv, true);
     }
   });
 

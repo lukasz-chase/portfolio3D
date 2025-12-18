@@ -2,6 +2,7 @@ import { create } from "zustand";
 import { PLAYER_INIT_POSITION } from "../constants";
 
 type Vec3 = { x: number; y: number; z: number };
+const POSITION_EPS = 0.01;
 
 type PlayerState = {
   position: Vec3;
@@ -22,7 +23,19 @@ type PlayerState = {
 
 export const usePlayerStore = create<PlayerState>((set) => ({
   position: PLAYER_INIT_POSITION,
-  setPosition: (x, y, z) => set({ position: { x, y, z } }),
+  setPosition: (x, y, z) =>
+    set((state) => {
+      const { position } = state;
+      if (
+        Math.abs(position.x - x) < POSITION_EPS &&
+        Math.abs(position.y - y) < POSITION_EPS &&
+        Math.abs(position.z - z) < POSITION_EPS
+      ) {
+        return state;
+      }
+
+      return { position: { x, y, z } };
+    }),
 
   hasMoved: false,
   setHasMoved: () => set({ hasMoved: true }),

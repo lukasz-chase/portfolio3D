@@ -73,7 +73,7 @@ const Experience: React.FC = () => {
           <HighlightEffects />
           <Suspense fallback={null}>
             <LoadingDone />
-            <Physics gravity={[0, -40, 0]}>
+            <Physics gravity={[0, -40, 0]} timeStep={1 / 60} interpolate>
               <World />
               <Player />
               <Dog />

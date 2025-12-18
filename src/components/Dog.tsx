@@ -31,6 +31,14 @@ const Dog: React.FC = () => {
   const lastRandomUpdate = useRef(0);
   const targetYawRef = useRef(0);
 
+  const dogPosRef = useRef(new THREE.Vector3());
+  const directionToPlayerRef = useRef(new THREE.Vector3());
+  const desiredDirectionRef = useRef(new THREE.Vector3());
+  const sidewaysRef = useRef(new THREE.Vector3());
+  const targetEulerRef = useRef(new THREE.Euler());
+  const targetQuatRef = useRef(new THREE.Quaternion());
+  const tmpLinvelRef = useRef({ x: 0, y: 0, z: 0 });
+
   const characterMesh = useMemo(() => {
     const clone = scene.children[0].clone(true);
     clone.position.set(0, 2, 0);
@@ -52,15 +60,16 @@ const Dog: React.FC = () => {
     if (!body || !playerHasMoved) return;
 
     const translation = body.translation();
-    const dogPosition = new THREE.Vector3(
+    const dogPosition = dogPosRef.current.set(
       translation.x,
       translation.y,
       translation.z
     );
 
-    const directionToPlayer = new THREE.Vector3().subVectors(
-      playerPosition,
-      dogPosition
+    const directionToPlayer = directionToPlayerRef.current.set(
+      playerPosition.x - dogPosition.x,
+      playerPosition.y - dogPosition.y,
+      playerPosition.z - dogPosition.z
     );
 
     // Update random factor periodically
@@ -70,46 +79,52 @@ const Dog: React.FC = () => {
     }
     // Follow player if not too close
     if (directionToPlayer.length() > 9) {
-      const desiredDirection = directionToPlayer.clone().normalize();
+      const desiredDirection = desiredDirectionRef.current
+        .copy(directionToPlayer)
+        .normalize();
 
       if (isOnFloorRef.current) {
-        body.setLinvel({ x: 0, y: JUMP_HEIGHT * jumpHeight, z: 0 }, true);
+        const lv = tmpLinvelRef.current;
+        lv.x = 0;
+        lv.y = JUMP_HEIGHT * jumpHeight;
+        lv.z = 0;
+        body.setLinvel(lv, true);
       }
       // Add some randomness to the path
-      const sideways = new THREE.Vector3(
-        -desiredDirection.z,
-        0,
-        desiredDirection.x
+      sidewaysRef.current.set(-desiredDirection.z, 0, desiredDirection.x);
+      desiredDirection.add(
+        sidewaysRef.current.multiplyScalar(randomFactor.current * 0.4)
       );
-      desiredDirection.add(sideways.multiplyScalar(randomFactor.current * 0.4));
 
       // Smoothly change direction
-      movementDirection.current.lerp(desiredDirection, delta * 2);
+      const dirAlpha = 1 - Math.exp(-2 * delta);
+      movementDirection.current.lerp(desiredDirection, dirAlpha);
 
-      body.setLinvel(
-        {
-          x: movementDirection.current.x * MOVE_SPEED * moveSpeed,
-          y: body.linvel().y,
-          z: movementDirection.current.z * MOVE_SPEED * moveSpeed,
-        },
-        true
-      );
+      const lv = tmpLinvelRef.current;
+      lv.x = movementDirection.current.x * MOVE_SPEED * moveSpeed;
+      lv.y = body.linvel().y;
+      lv.z = movementDirection.current.z * MOVE_SPEED * moveSpeed;
+      body.setLinvel(lv, true);
 
       // Rotate dog to face movement direction
       targetYawRef.current = Math.atan2(
         movementDirection.current.x,
         movementDirection.current.z
       );
-      const q = new THREE.Quaternion().setFromEuler(
-        new THREE.Euler(0, targetYawRef.current + Math.PI / 2, 0)
-      );
-      body.setRotation(q, true);
+      targetEulerRef.current.set(0, targetYawRef.current + Math.PI / 2, 0);
+      targetQuatRef.current.setFromEuler(targetEulerRef.current);
+      body.setRotation(targetQuatRef.current, true);
     } else {
       // Stop moving if close to the player
       // Apply strong damping to halt movement quickly
       const linvel = body.linvel();
+      const damping = Math.exp(-14 * delta);
+      const lv = tmpLinvelRef.current;
+      lv.x = linvel.x * damping;
+      lv.y = linvel.y;
+      lv.z = linvel.z * damping;
       body.setLinvel(
-        { x: linvel.x * 0.8, y: linvel.y, z: linvel.z * 0.8 },
+        lv,
         true
       );
       // Reset the movement direction to prevent sudden lurches
@@ -119,7 +134,11 @@ const Dog: React.FC = () => {
     // Respawn if falling
     if (translation.y < -20) {
       body.setTranslation(DOG_INIT_POSITION, true);
-      body.setLinvel({ x: 0, y: 0, z: 0 }, true);
+      const lv = tmpLinvelRef.current;
+      lv.x = 0;
+      lv.y = 0;
+      lv.z = 0;
+      body.setLinvel(lv, true);
     }
   });
 
