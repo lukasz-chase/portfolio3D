@@ -7,6 +7,7 @@ import type { ComponentProps, ReactNode } from "react";
 import { useAudioStore } from "../store/useAudioStore";
 import * as THREE from "three";
 import { SoundId } from "../types";
+import { usePostHog } from "posthog-js/react";
 
 type InteractiveModelProps = {
   path: string;
@@ -25,6 +26,7 @@ const InteractiveModel = forwardRef<Group, InteractiveModelProps>(
     const { scene } = useGLTF(path) as GLTF;
     const [hovered, setHovered] = useState(false);
     const playSound = useAudioStore((s) => s.playSound);
+    const posthog = usePostHog();
 
     useCursor(hovered && !!onClick);
 
@@ -48,6 +50,9 @@ const InteractiveModel = forwardRef<Group, InteractiveModelProps>(
 
     const handleOnClick = (e: any) => {
       e.stopPropagation();
+      if (onClick) {
+        posthog.capture("interactive_model_click", { property: path });
+      }
       if (onClick) {
         // If a ref is forwarded, use its current value, otherwise use the event object.
         // This gives the parent component direct access to the model.
